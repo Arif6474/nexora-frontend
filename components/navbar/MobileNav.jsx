@@ -11,7 +11,9 @@ const MobileNav = ({
     activeNestedMenu,
     toggleNestedMenu,
     handleSearchClick,
-    handleAuthClick
+    handleAuthClick,
+    user,
+    logout
 }) => {
     return (
         <div
@@ -80,19 +82,38 @@ const MobileNav = ({
                         <Search className="w-5 h-5" />
                         Search
                     </button>
-                    <button
-                        onClick={handleAuthClick}
-                        className="flex items-center justify-center gap-3 bg-stone-50 p-4 text-stone-900 font-black rounded-2xl hover:bg-stone-100 transition-all active:scale-95 uppercase text-xs tracking-widest"
-                    >
-                        <User className="w-5 h-5" />
-                        Account
-                    </button>
+                    {user ? (
+                        <Link
+                            href="/profile"
+                            onClick={() => setIsOpen(false)}
+                            className="flex items-center justify-center gap-3 bg-stone-50 p-4 text-stone-900 font-black rounded-2xl hover:bg-stone-100 transition-all active:scale-95 uppercase text-xs tracking-widest"
+                        >
+                            <User className="w-5 h-5 text-emerald-600" />
+                            Profile
+                        </Link>
+                    ) : (
+                        <button
+                            onClick={handleAuthClick}
+                            className="flex items-center justify-center gap-3 bg-stone-50 p-4 text-stone-900 font-black rounded-2xl hover:bg-stone-100 transition-all active:scale-95 uppercase text-xs tracking-widest"
+                        >
+                            <User className="w-5 h-5" />
+                            Account
+                        </button>
+                    )}
                 </div>
 
-                <button className="mt-4 flex items-center justify-center gap-3 bg-emerald-700 text-white p-5 font-black rounded-2xl shadow-xl shadow-emerald-100 hover:bg-emerald-800 transition-all active:scale-[0.98] uppercase tracking-widest text-sm">
-                    <ShoppingBag className="w-5.5 h-5.5" />
-                    View Cart (0)
-                </button>
+                {user && (
+                    <button
+                        onClick={() => {
+                            logout();
+                            setIsOpen(false);
+                        }}
+                        className="mt-4 flex items-center justify-center gap-3 bg-red-50 text-red-600 p-4 font-black rounded-2xl border border-red-100 transition-all active:scale-[0.98] uppercase tracking-widest text-xs"
+                    >
+                        Logout
+                    </button>
+                )}
+
             </div>
         </div>
     );

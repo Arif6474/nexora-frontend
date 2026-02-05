@@ -3,11 +3,13 @@
 import React, { useState } from "react";
 import { Mail, Lock, Loader2, AtSign, ShieldCheck } from "lucide-react";
 import FormInput from "./FormInput";
+import { useAuth } from "@/context/AuthContext";
 
 const RegisterForm = ({ onSwitch, onSuccess }) => {
     const [formData, setFormData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+    const { register } = useAuth();
 
     const validate = () => {
         let newErrors = {};
@@ -27,16 +29,23 @@ const RegisterForm = ({ onSwitch, onSuccess }) => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validate()) return;
 
         setIsLoading(true);
-        // Simulate API call
-        setTimeout(() => {
-            setIsLoading(false);
+        try {
+            await register({
+                name: formData.name,
+                email: formData.email,
+                password: formData.password
+            });
             onSuccess?.();
-        }, 1500);
+        } catch (error) {
+            setErrors({ submit: "Failed to create account. Please try again." });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (

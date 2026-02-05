@@ -3,12 +3,13 @@
 import React, { useState } from "react";
 import { Mail, Lock, Loader2 } from "lucide-react";
 import FormInput from "./FormInput";
+import { useAuth } from "@/context/AuthContext";
 
 const LoginForm = ({ onSwitch, onForgotPassword, onSuccess }) => {
     const [formData, setFormData] = useState({ email: "", password: "" });
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
+    const { login } = useAuth();
 
     const validate = () => {
         let newErrors = {};
@@ -21,16 +22,19 @@ const LoginForm = ({ onSwitch, onForgotPassword, onSuccess }) => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validate()) return;
 
         setIsLoading(true);
-        // Simulate API call
-        setTimeout(() => {
-            setIsLoading(false);
+        try {
+            await login(formData.email, formData.password);
             onSuccess?.();
-        }, 1500);
+        } catch (error) {
+            setErrors({ submit: "Failed to login. Please check your credentials." });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (

@@ -11,6 +11,7 @@ import SearchModal from "./SearchModal";
 import WishlistSidebar from "./WishlistSidebar";
 import CartSidebar from "./CartSidebar";
 import { allProducts } from "../../app/data/products";
+import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -33,6 +34,8 @@ const Navbar = () => {
 
     // Cart State
     const [isCartOpen, setIsCartOpen] = useState(false);
+
+    const { user, logout } = useAuth();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -124,6 +127,8 @@ const Navbar = () => {
                     toggleNestedMenu={toggleNestedMenu}
                     handleSearchClick={handleSearchClick}
                     handleAuthClick={handleAuthClick}
+                    user={user}
+                    logout={logout}
                 />
             </nav>
 
