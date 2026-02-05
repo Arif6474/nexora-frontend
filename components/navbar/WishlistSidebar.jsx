@@ -26,9 +26,9 @@ const WishlistSidebar = ({ isOpen, onClose }) => {
             {/* Sidebar Panel */}
             <div className="absolute inset-y-0 right-0 max-w-full flex">
                 <div className="w-screen max-w-md bg-white shadow-2xl animate-fade-in-left">
-                    <div className="h-full flex flex-col py-6 bg-white overflow-y-scroll no-scrollbar">
+                    <div className="h-full flex flex-col pt-6 bg-white overflow-hidden">
                         {/* Header */}
-                        <div className="px-6 flex items-center justify-between mb-8">
+                        <div className="px-6 flex items-center justify-between mb-8 flex-shrink-0">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center">
                                     <Heart className="w-5 h-5 text-emerald-600 fill-emerald-600" />
@@ -49,7 +49,7 @@ const WishlistSidebar = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Content */}
-                        <div className="flex-1 px-6">
+                        <div className="flex-1 overflow-y-auto no-scrollbar px-6">
                             {wishlistProducts.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center py-20">
                                     <div className="w-20 h-20 rounded-full bg-stone-50 flex items-center justify-center mb-6">
@@ -119,7 +119,7 @@ const WishlistSidebar = ({ isOpen, onClose }) => {
 
                         {/* Footer */}
                         {wishlistProducts.length > 0 && (
-                            <div className="px-6 pt-8 mt-auto border-t border-stone-100">
+                            <div className="px-6 py-6 border-t border-stone-100 bg-white shadow-[0_-10px_40px_rgba(0,0,0,0.02)] flex-shrink-0">
                                 <Link
                                     href="/shop"
                                     onClick={onClose}

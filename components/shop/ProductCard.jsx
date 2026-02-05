@@ -77,7 +77,7 @@ const ProductCard = ({ product, onQuickView }) => {
                 </Link>
 
                 {/* Rating */}
-                <div className="flex items-center gap-2 mb-3">
+                {/* <div className="flex items-center gap-2 mb-3">
                     <div className="flex items-center gap-0.5">
                         {[...Array(5)].map((_, i) => (
                             <Star
@@ -90,10 +90,10 @@ const ProductCard = ({ product, onQuickView }) => {
                         ))}
                     </div>
                     <span className="text-xs text-stone-500 font-medium">({reviews})</span>
-                </div>
+                </div> */}
 
                 {/* Price */}
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 ">
                     <span className="text-xl font-black text-stone-900">${price}</span>
                     {originalPrice && (
                         <span className="text-sm font-medium text-stone-400 line-through">${originalPrice}</span>

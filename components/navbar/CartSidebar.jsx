@@ -21,9 +21,9 @@ const CartSidebar = ({ isOpen, onClose }) => {
             {/* Sidebar Panel */}
             <div className="absolute inset-y-0 right-0 max-w-full flex">
                 <div className="w-screen max-w-md bg-white shadow-2xl animate-fade-in-left">
-                    <div className="h-full flex flex-col py-6 bg-white overflow-y-scroll no-scrollbar">
+                    <div className="h-full flex flex-col pt-6 bg-white overflow-hidden">
                         {/* Header */}
-                        <div className="px-6 flex items-center justify-between mb-8">
+                        <div className="px-6 flex items-center justify-between mb-8 flex-shrink-0">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center">
                                     <ShoppingBag className="w-5 h-5 text-emerald-600" />
@@ -44,7 +44,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Content */}
-                        <div className="flex-1 px-6">
+                        <div className="flex-1 overflow-y-auto no-scrollbar px-6">
                             {cart.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center py-20">
                                     <div className="w-20 h-20 rounded-full bg-stone-50 flex items-center justify-center mb-6">
@@ -118,15 +118,19 @@ const CartSidebar = ({ isOpen, onClose }) => {
 
                         {/* Footer */}
                         {cart.length > 0 && (
-                            <div className="px-6 pt-8 mt-auto border-t border-stone-100 space-y-4">
+                            <div className="px-6 py-6 border-t border-stone-100 space-y-4 bg-white shadow-[0_-10px_40px_rgba(0,0,0,0.02)] flex-shrink-0">
                                 <div className="flex items-center justify-between px-2">
                                     <span className="text-xs font-black uppercase tracking-widest text-stone-400">Subtotal</span>
                                     <span className="text-2xl font-black text-stone-900">${cartTotal}</span>
                                 </div>
-                                <button className="w-full py-5 bg-stone-900 text-white font-black uppercase tracking-[0.2em] text-xs rounded-2xl hover:bg-emerald-700 transition-all flex items-center justify-center gap-3 shadow-2xl shadow-stone-900/20 group">
+                                <Link
+                                    href="/checkout"
+                                    onClick={onClose}
+                                    className="w-full py-5 bg-stone-900 text-white font-black uppercase tracking-[0.2em] text-xs rounded-2xl hover:bg-emerald-700 transition-all flex items-center justify-center gap-3 shadow-2xl shadow-stone-900/20 group"
+                                >
                                     Checkout
                                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                </button>
+                                </Link>
                                 <p className="text-[10px] font-bold text-stone-400 text-center uppercase tracking-widest">
                                     Shipping & taxes calculated at checkout
                                 </p>
