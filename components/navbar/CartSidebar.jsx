@@ -64,7 +64,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                                 <div className="space-y-6">
                                     {cart.map((item, idx) => (
                                         <div key={`${item.id}-${item.size}-${item.color}-${idx}`} className="group relative flex gap-4 p-4 rounded-3xl border border-stone-100 hover:border-emerald-100 hover:bg-emerald-50/30 transition-all">
-                                            <div className="w-24 h-28 flex-shrink-0 rounded-2xl overflow-hidden bg-stone-100">
+                                            <div className="w-24 h-24 flex-shrink-0 rounded-2xl overflow-hidden bg-stone-100">
                                                 <img
                                                     src={item.image}
                                                     alt={item.name}

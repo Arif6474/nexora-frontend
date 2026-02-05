@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import Hero from '../components/Hero'
 import Footer from '../components/Footer'
 import TrendingProducts from '../components/home/TrendingProducts'
+import NewArrivals from '../components/home/NewArrivals'
 import QuickViewModal from '../components/shop/QuickViewModal'
 
 function Home() {
@@ -14,6 +15,8 @@ function Home() {
       <Hero />
 
       <TrendingProducts onQuickView={setSelectedProduct} />
+
+      <NewArrivals onQuickView={setSelectedProduct} />
 
       <Footer />
 

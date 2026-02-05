@@ -287,7 +287,7 @@ const CheckoutPage = () => {
                                 <div className="space-y-6 mb-10 max-h-[400px] overflow-y-auto no-scrollbar">
                                     {cart.map((item, idx) => (
                                         <div key={`${item.id}-${item.size}-${item.color}-${idx}`} className="flex gap-4">
-                                            <div className="w-20 h-24 bg-stone-100 rounded-2xl overflow-hidden flex-shrink-0">
+                                            <div className="w-24 h-24 bg-stone-100 rounded-2xl overflow-hidden flex-shrink-0">
                                                 <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                                             </div>
                                             <div className="flex-1 min-w-0 py-1">

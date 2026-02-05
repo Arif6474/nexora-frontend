@@ -72,7 +72,7 @@ const WishlistSidebar = ({ isOpen, onClose }) => {
                                             <Link
                                                 href={`/product/${product.id}`}
                                                 onClick={onClose}
-                                                className="w-24 h-28 flex-shrink-0 rounded-2xl overflow-hidden bg-stone-100"
+                                                className="w-24 h-24 flex-shrink-0 rounded-2xl overflow-hidden bg-stone-100"
                                             >
                                                 <img
                                                     src={product.image}
@@ -107,9 +107,7 @@ const WishlistSidebar = ({ isOpen, onClose }) => {
                                                     </div>
                                                 </div>
 
-                                                <button className="flex items-center gap-2 text-[10px] font-black text-stone-900 uppercase tracking-widest hover:text-emerald-600 transition-all">
-                                                    Add to Basket <ArrowRight className="w-3 h-3" />
-                                                </button>
+                                              
                                             </div>
                                         </div>
                                     ))}
