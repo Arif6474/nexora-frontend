@@ -21,6 +21,7 @@ import ProductCard from "@/components/shop/ProductCard";
 import QuickViewModal from "@/components/shop/QuickViewModal";
 import { allProducts } from "../../data/products";
 import { useWishlist } from "@/context/WishlistContext";
+import { useCart } from "@/context/CartContext";
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -33,6 +34,8 @@ const ProductDetails = () => {
     const sliderRef = useRef(null);
     const [isPaused, setIsPaused] = useState(false);
     const { toggleWishlist, isInWishlist } = useWishlist();
+    const { addToCart } = useCart();
+    const [showError, setShowError] = useState(false);
 
     const product = useMemo(() => {
         return allProducts.find((p) => p.id.toString() === id);
@@ -95,6 +98,15 @@ const ProductDetails = () => {
 
     const currentSize = selectedSize || product.size || "";
     const currentColor = selectedColor || product.color || "";
+
+    const handleAddToCart = () => {
+        if (!currentSize || !currentColor) {
+            setShowError(true);
+            setTimeout(() => setShowError(false), 2000);
+            return;
+        }
+        addToCart(product, currentSize, currentColor, quantity);
+    };
 
     return (
         <div className="min-h-screen bg-stone-50">
@@ -175,8 +187,13 @@ const ProductDetails = () => {
                         </p>
 
                         {/* Color Selector */}
-                        <div className="mb-8">
-                            <h3 className="text-xs font-black uppercase tracking-widest text-stone-400 mb-4">Select Color</h3>
+                        <div className={`mb-8 transition-all duration-300 ${showError && !currentColor ? "p-4 bg-red-50 rounded-3xl border border-red-100 ring-4 ring-red-500/10" : ""}`}>
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-xs font-black uppercase tracking-widest text-stone-400">Select Color</h3>
+                                {showError && !currentColor && (
+                                    <span className="text-[10px] font-black text-red-500 uppercase tracking-widest animate-bounce">Required</span>
+                                )}
+                            </div>
                             <div className="flex items-center gap-3">
                                 {colors.map((color) => (
                                     <button
@@ -199,9 +216,12 @@ const ProductDetails = () => {
                         </div>
 
                         {/* Size Selector */}
-                        <div className="mb-8">
+                        <div className={`mb-8 transition-all duration-300 ${showError && !currentSize ? "p-4 bg-red-50 rounded-3xl border border-red-100 ring-4 ring-red-500/10" : ""}`}>
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-xs font-black uppercase tracking-widest text-stone-400">Select Size</h3>
+                                {showError && !currentSize && (
+                                    <span className="text-[10px] font-black text-red-500 uppercase tracking-widest animate-bounce">Required</span>
+                                )}
                                 <button className="text-[10px] font-black uppercase tracking-widest text-emerald-700 hover:underline">Size Guide</button>
                             </div>
                             <div className="grid grid-cols-5 gap-3">
@@ -237,9 +257,12 @@ const ProductDetails = () => {
                                     <Plus className="w-4 h-4" />
                                 </button>
                             </div>
-                            <button className="flex-1 py-5 bg-stone-900 hover:bg-emerald-700 text-white font-black uppercase tracking-[0.2em] text-sm rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-stone-900/20 flex items-center justify-center gap-3">
+                            <button
+                                onClick={handleAddToCart}
+                                className={`flex-1 py-5 font-black uppercase tracking-[0.2em] text-sm rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-2xl flex items-center justify-center gap-3 ${showError && (!currentSize || !currentColor) ? "bg-red-500 shadow-red-500/20" : "bg-stone-900 shadow-stone-900/20 hover:bg-emerald-700"}`}
+                            >
                                 <ShoppingCart className="w-5 h-5" />
-                                Add To Portfolio
+                                {showError && (!currentSize || !currentColor) ? "Select Options" : "Add To Basket"}
                             </button>
                             <button
                                 onClick={() => toggleWishlist(product.id)}

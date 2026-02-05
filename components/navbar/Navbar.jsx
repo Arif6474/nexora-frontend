@@ -9,6 +9,7 @@ import MobileNav from "./MobileNav";
 import ActionIcons from "./ActionIcons";
 import SearchModal from "./SearchModal";
 import WishlistSidebar from "./WishlistSidebar";
+import CartSidebar from "./CartSidebar";
 import { allProducts } from "../../app/data/products";
 
 const Navbar = () => {
@@ -29,6 +30,9 @@ const Navbar = () => {
 
     // Wishlist State
     const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+
+    // Cart State
+    const [isCartOpen, setIsCartOpen] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -60,7 +64,7 @@ const Navbar = () => {
 
     // Global Scroll Lock (Search Modal only, AuthModal handles its own)
     useEffect(() => {
-        if (isSearchOpen || isWishlistOpen) {
+        if (isSearchOpen || isWishlistOpen || isCartOpen) {
             document.body.style.overflow = "hidden";
             if (isSearchOpen) {
                 setTimeout(() => searchInputRef.current?.focus(), 100);
@@ -68,7 +72,7 @@ const Navbar = () => {
         } else if (!isAuthOpen) {
             document.body.style.overflow = "auto";
         }
-    }, [isSearchOpen, isAuthOpen, isWishlistOpen]);
+    }, [isSearchOpen, isAuthOpen, isWishlistOpen, isCartOpen]);
 
     const toggleSubmenu = (name) => {
         setActiveSubmenu(activeSubmenu === name ? null : name);
@@ -103,6 +107,7 @@ const Navbar = () => {
                     <ActionIcons
                         setIsSearchOpen={setIsSearchOpen}
                         setIsWishlistOpen={setIsWishlistOpen}
+                        setIsCartOpen={setIsCartOpen}
                         handleAuthClick={handleAuthClick}
                         isOpen={isOpen}
                         setIsOpen={setIsOpen}
@@ -140,6 +145,11 @@ const Navbar = () => {
             <WishlistSidebar
                 isOpen={isWishlistOpen}
                 onClose={() => setIsWishlistOpen(false)}
+            />
+
+            <CartSidebar
+                isOpen={isCartOpen}
+                onClose={() => setIsCartOpen(false)}
             />
         </>
     );

@@ -1,18 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
-import { X, ShoppingCart, Star, Heart, Maximize2 } from "lucide-react";
+import { X, ShoppingCart, Star, Heart, Maximize2, Plus, Minus } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
+import { useCart } from "@/context/CartContext";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const QuickViewModal = ({ product, isOpen, onClose }) => {
     const { toggleWishlist, isInWishlist } = useWishlist();
+    const { addToCart } = useCart();
     const [selectedSize, setSelectedSize] = useState("");
     const [selectedColor, setSelectedColor] = useState("");
+    const [quantity, setQuantity] = useState(1);
+    const [showError, setShowError] = useState(false);
     const [mainImage, setMainImage] = useState(product?.image || "");
 
     // Update mainImage when product changes or modal opens
-    React.useEffect(() => {
+useEffect(() => {
         if (product) setMainImage(product.image);
     }, [product]);
 
@@ -106,58 +110,95 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
                     </div>
 
                     <p className="text-stone-500 font-medium leading-relaxed mb-8 text-sm">
-                        Elevate your everyday style with this premium piece from Nexora. Crafted with unparalleled attention to detail and designed for the modern individual who values both aesthetics and quality.
+                        {product.description || "Elevate your everyday style with this premium piece from Nexora. Crafted with unparalleled attention to detail."}
                     </p>
 
-                    {/* Color selection */}
-                    <div className="mb-6">
-                        <h3 className="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3">Color</h3>
-                        <div className="flex gap-2">
-                            {colors.map((c) => (
-                                <button
-                                    key={c.name}
-                                    onClick={() => setSelectedColor(c.name)}
-                                    className={`w-8 h-8 rounded-full border-2 transition-all ${selectedColor === c.name ? "border-emerald-600 scale-110" : "border-transparent"}`}
-                                    style={{ backgroundColor: c.hex }}
-                                />
-                            ))}
+                    <div className="space-y-6">
+                        {/* Color selection */}
+                        <div className={`transition-all duration-300 ${showError && !selectedColor ? "p-3 bg-red-50 rounded-2xl ring-2 ring-red-500/10" : ""}`}>
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-[10px] font-black uppercase tracking-widest text-stone-400">Color</h3>
+                                {showError && !selectedColor && <span className="text-[8px] font-black text-red-500 uppercase tracking-widest animate-pulse">Required</span>}
+                            </div>
+                            <div className="flex gap-2">
+                                {colors.map((c) => (
+                                    <button
+                                        key={c.name}
+                                        onClick={() => setSelectedColor(c.name)}
+                                        className={`w-8 h-8 rounded-full border-2 transition-all ${selectedColor === c.name ? "border-emerald-600 scale-110" : "border-transparent"}`}
+                                        style={{ backgroundColor: c.hex }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Size selection */}
+                        <div className={`transition-all duration-300 ${showError && !selectedSize ? "p-3 bg-red-50 rounded-2xl ring-2 ring-red-500/10" : ""}`}>
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-[10px] font-black uppercase tracking-widest text-stone-400">Size</h3>
+                                {showError && !selectedSize && <span className="text-[8px] font-black text-red-500 uppercase tracking-widest animate-pulse">Required</span>}
+                            </div>
+                            <div className="grid grid-cols-4 gap-2">
+                                {sizes.map((s) => (
+                                    <button
+                                        key={s}
+                                        onClick={() => setSelectedSize(s)}
+                                        className={`py-2 text-xs font-black rounded-xl border-2 transition-all ${selectedSize === s ? "border-emerald-600 bg-emerald-50 text-emerald-700" : "border-stone-100 text-stone-500 hover:border-stone-200"}`}
+                                    >
+                                        {s}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
-                    {/* Size selection */}
-                    <div className="mb-8">
-                        <h3 className="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3">Size</h3>
-                        <div className="grid grid-cols-4 gap-2">
-                            {sizes.map((s) => (
+                    <div className="flex flex-col gap-4 mt-8 pt-6 border-t border-stone-100">
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center justify-between bg-stone-50 border border-stone-200 rounded-xl p-1 min-w-[100px]">
                                 <button
-                                    key={s}
-                                    onClick={() => setSelectedSize(s)}
-                                    className={`py-2 text-xs font-black rounded-xl border-2 transition-all ${selectedSize === s ? "border-emerald-600 bg-emerald-50 text-emerald-700 font-black" : "border-stone-100 text-stone-500 hover:border-stone-200"}`}
+                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                    className="w-8 h-8 flex items-center justify-center text-stone-400 hover:text-stone-900 transition-colors"
                                 >
-                                    {s}
+                                    <Minus className="w-3 h-3" />
                                 </button>
-                            ))}
+                                <span className="text-xs font-black text-stone-900">{quantity}</span>
+                                <button
+                                    onClick={() => setQuantity(quantity + 1)}
+                                    className="w-8 h-8 flex items-center justify-center text-stone-400 hover:text-stone-900 transition-colors"
+                                >
+                                    <Plus className="w-3 h-3" />
+                                </button>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    if (!selectedSize || !selectedColor) {
+                                        setShowError(true);
+                                        setTimeout(() => setShowError(false), 2000);
+                                        return;
+                                    }
+                                    addToCart(product, selectedSize, selectedColor, quantity);
+                                }}
+                                className={`flex-1 py-4 font-black uppercase tracking-[0.2em] text-[10px] rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl flex items-center justify-center gap-2 ${showError && (!selectedSize || !selectedColor) ? "bg-red-500 shadow-red-500/20" : "bg-stone-900 shadow-stone-900/20 hover:bg-emerald-700"}`}
+                            >
+                                <ShoppingCart className="w-4 h-4" />
+                                {showError && (!selectedSize || !selectedColor) ? "Select Options" : "Add To Basket"}
+                            </button>
                         </div>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-stone-100">
-                        <button className="flex-1 py-4 bg-stone-900 hover:bg-emerald-700 text-white font-black uppercase tracking-widest text-xs rounded-2xl transition-all shadow-xl shadow-stone-900/10 flex items-center justify-center gap-2">
-                            <ShoppingCart className="w-4 h-4" />
-                            Add to Cart
-                        </button>
                         <div className="flex gap-3">
                             <button
                                 onClick={() => toggleWishlist(product.id)}
-                                className={`w-14 h-14 rounded-2xl border-2 flex items-center justify-center transition-all ${wishlisted ? "border-emerald-600 bg-emerald-50 text-emerald-600" : "border-stone-100 text-stone-400 hover:border-stone-200"}`}
+                                className={`flex-1 h-12 rounded-xl border-2 flex items-center justify-center gap-2 transition-all ${wishlisted ? "border-emerald-600 bg-emerald-50 text-emerald-600" : "border-stone-100 text-stone-400 hover:border-stone-200"}`}
                             >
-                                <Heart className={`w-5 h-5 ${wishlisted ? "fill-emerald-600" : ""}`} />
+                                <Heart className={`w-4 h-4 ${wishlisted ? "fill-emerald-600" : ""}`} />
+                                <span className="text-[8px] font-black uppercase tracking-widest">Wishlist</span>
                             </button>
                             <Link
                                 href={`/product/${product.id}`}
                                 onClick={onClose}
-                                className="w-14 h-14 rounded-2xl border-2 border-stone-100 flex items-center justify-center text-stone-400 hover:text-stone-900 transition-all"
+                                className="flex-1 h-12 rounded-xl border-2 border-stone-100 flex items-center justify-center gap-2 text-stone-400 hover:text-stone-900 transition-all"
                             >
-                                <Maximize2 className="w-5 h-5" />
+                                <Maximize2 className="w-4 h-4" />
+                                <span className="text-[8px] font-black uppercase tracking-widest">Details</span>
                             </Link>
                         </div>
                     </div>

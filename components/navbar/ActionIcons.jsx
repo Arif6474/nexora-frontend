@@ -1,14 +1,17 @@
 import { Search, User, ShoppingBag, X, Menu, Heart } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
+import { useCart } from "@/context/CartContext";
 
 const ActionIcons = ({
     setIsSearchOpen,
     setIsWishlistOpen,
+    setIsCartOpen,
     handleAuthClick,
     isOpen,
     setIsOpen
 }) => {
     const { wishlist } = useWishlist();
+    const { cartCount } = useCart();
     return (
         <div className="flex items-center gap-1 sm:gap-4">
             <button
@@ -32,11 +35,16 @@ const ActionIcons = ({
             >
                 <User className="w-5.5 h-5.5" />
             </button>
-            <button className="relative p-2 sm:p-2.5 text-white rounded-xl sm:rounded-2xl bg-emerald-700 hover:bg-emerald-700 shadow-lg shadow-stone-200 transition-all duration-300 hover:scale-105 active:scale-95 group">
+            <button
+                onClick={() => setIsCartOpen(true)}
+                className="relative p-2 sm:p-2.5 text-white rounded-xl sm:rounded-2xl bg-emerald-700 hover:bg-stone-900 shadow-lg shadow-stone-200 transition-all duration-300 hover:scale-105 active:scale-95 group"
+            >
                 <ShoppingBag className="w-5 h-5 sm:w-5.5 sm:h-5.5 group-hover:rotate-6 transition-transform" />
-                <span className="absolute -top-1 -right-1 sm:-top-1.5 sm:-right-1.5 bg-amber-500 text-white text-[9px] sm:text-[10px] font-black w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center border-2 sm:border-[3px] border-white shadow-sm ring-1 ring-stone-100/10">
-                    0
-                </span>
+                {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 sm:-top-1.5 sm:-right-1.5 bg-amber-500 text-white text-[9px] sm:text-[10px] font-black w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center border-2 sm:border-[3px] border-white shadow-sm ring-1 ring-stone-100/10 animate-bounce">
+                        {cartCount}
+                    </span>
+                )}
             </button>
 
             {/* Mobile Toggle */}

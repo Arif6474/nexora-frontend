@@ -101,10 +101,10 @@ const ProductCard = ({ product, onQuickView }) => {
                 </div>
 
                 {/* Add to Cart Button */}
-                <button className="w-full py-3 bg-stone-900 hover:bg-emerald-600 text-white font-black uppercase tracking-wider text-xs rounded-xl transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 shadow-lg">
+                {/* <button className="w-full py-3 bg-stone-900 hover:bg-emerald-600 text-white font-black uppercase tracking-wider text-xs rounded-xl transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 shadow-lg">
                     <ShoppingCart className="w-4 h-4" />
                     Add to Cart
-                </button>
+                </button> */}
             </div>
         </div>
     );
