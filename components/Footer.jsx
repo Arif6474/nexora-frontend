@@ -126,14 +126,20 @@ const Footer = () => {
                             Support
                         </h4>
                         <ul className="space-y-4">
-                            {["Contact Us", "Shipping Info", "Returns", "Size Guide", "FAQ"].map((item) => (
-                                <li key={item}>
+                            {[
+                                { name: "Contact Us", href: "/contact" },
+                                { name: "Shipping Info", href: "#" },
+                                { name: "Returns", href: "#" },
+                                { name: "Size Guide", href: "#" },
+                                { name: "FAQ", href: "#" }
+                            ].map((item) => (
+                                <li key={item.name}>
                                     <Link
-                                        href="#"
+                                        href={item.href}
                                         className="group text-sm text-stone-400 hover:text-white transition-colors font-medium inline-flex items-center gap-2"
                                     >
                                         <span className="w-0 group-hover:w-2 h-0.5 bg-emerald-500 transition-all" />
-                                        {item}
+                                        {item.name}
                                     </Link>
                                 </li>
                             ))}
