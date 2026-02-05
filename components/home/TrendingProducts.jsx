@@ -41,7 +41,7 @@ const TrendingProducts = ({ onQuickView }) => {
     return (
         <section
             ref={sectionRef}
-            className="relative py-40 bg-stone-950 overflow-hidden"
+            className="relative py-32 bg-stone-950 overflow-hidden"
         >
             {/* Dynamic Spotlight Background */}
             <div

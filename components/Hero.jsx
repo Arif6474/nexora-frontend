@@ -29,7 +29,7 @@ const Hero = () => {
                     {/* Headline */}
                     <h1 className="text-4xl sm:text-6xl lg:text-8xl font-black text-white leading-[0.9] tracking-tighter mb-6 sm:mb-8 animate-fade-in-up delay-100">
                         ELEVATE YOUR <br />
-                        <span className="text-emerald-400">SIGNATURE</span> STYLE
+                        <span className="text-emerald-400 tracking-tighter">SIGNATURE</span> STYLE
                     </h1>
 
                     {/* Description */}

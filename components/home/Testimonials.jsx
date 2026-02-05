@@ -117,7 +117,7 @@ const Testimonials = () => {
     const col3 = [...testimonials.slice(4, 6)];
 
     return (
-        <section className="relative py-12 bg-stone-100 overflow-hidden">
+        <section className="relative py-32 bg-stone-100 overflow-hidden">
             {/* Background Ghost Text */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap pointer-events-none opacity-[0.02] select-none scale-150 rotate-[-15deg]">
                 <h2 className="text-[20rem] font-black uppercase tracking-tighter text-stone-900 leading-none">

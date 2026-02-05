@@ -21,7 +21,7 @@ const NewArrivals = ({ onQuickView }) => {
     };
 
     return (
-        <section className="relative py-32 bg-[#F9F8F6] overflow-hidden">
+        <section className="relative py-32 bg-stone-50 overflow-hidden">
             {/* Minimalist Accents */}
             <div className="absolute top-0 left-0 w-full h-px bg-stone-200" />
 
@@ -33,7 +33,7 @@ const NewArrivals = ({ onQuickView }) => {
                             <span className="w-12 h-px bg-stone-900" />
                             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-stone-400">The Studio Collection</span>
                         </div>
-                        <h2 className="text-5xl sm:text-6xl font-serif italic text-stone-900 leading-tight">
+                        <h2 className="text-5xl sm:text-6xl font-serif italic text-stone-900 leading-tight tracking-tighter">
                             Latest <span className="font-sans normal-case not-italic font-black text-emerald-800">Additions</span>
                         </h2>
                     </div>
@@ -62,7 +62,7 @@ const NewArrivals = ({ onQuickView }) => {
                     {products.map((product, idx) => (
                         <div
                             key={product.id}
-                            className="relative min-w-[300px] sm:min-w-[400px] aspect-4/5 group snap-start overflow-hidden rounded-[32px] bg-white border border-stone-100 shadow-xl shadow-stone-200/50"
+                            className="relative min-w-[300px] sm:min-w-[400px] aspect-4/5 group snap-start overflow-hidden rounded-[40px] bg-white border border-stone-100 shadow-xl shadow-stone-200/50"
                         >
                             <img
                                 src={product.image}
@@ -75,8 +75,8 @@ const NewArrivals = ({ onQuickView }) => {
                                 <button
                                     onClick={() => toggleWishlist(product.id)}
                                     className={`w-12 h-12 rounded-full backdrop-blur-md flex items-center justify-center transition-all transform -translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 duration-500 border ${isInWishlist(product.id)
-                                            ? "bg-stone-900 border-stone-900 text-white"
-                                            : "bg-white/10 border-white/20 text-white hover:bg-white hover:text-stone-900"
+                                        ? "bg-stone-900 border-stone-900 text-white"
+                                        : "bg-white/10 border-white/20 text-white hover:bg-white hover:text-stone-900"
                                         }`}
                                 >
                                     <Heart className={`w-5 h-5 ${isInWishlist(product.id) ? "fill-current" : ""}`} />
@@ -119,7 +119,7 @@ const NewArrivals = ({ onQuickView }) => {
                     ))}
 
                     {/* Final "View All" Card */}
-                    <div className="min-w-[300px] sm:min-w-[400px] aspect-4/5 flex flex-col items-center justify-center bg-emerald-800 rounded-[32px] relative overflow-hidden group">
+                    <div className="min-w-[300px] sm:min-w-[400px] aspect-4/5 flex flex-col items-center justify-center bg-emerald-800 rounded-[40px] relative overflow-hidden group">
                         <div className="absolute inset-0 opacity-10">
                             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-white via-transparent to-transparent" />
                         </div>
