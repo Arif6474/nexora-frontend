@@ -8,6 +8,8 @@ import DesktopNav from "./DesktopNav";
 import MobileNav from "./MobileNav";
 import ActionIcons from "./ActionIcons";
 import SearchModal from "./SearchModal";
+import WishlistSidebar from "./WishlistSidebar";
+import { allProducts } from "../../app/data/products";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -24,6 +26,9 @@ const Navbar = () => {
 
     // Auth Modal State
     const [isAuthOpen, setIsAuthOpen] = useState(false);
+
+    // Wishlist State
+    const [isWishlistOpen, setIsWishlistOpen] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -42,8 +47,8 @@ const Navbar = () => {
 
         setIsSearching(true);
         const timer = setTimeout(() => {
-            const results = dummyProducts.filter(p =>
-                p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            const results = allProducts.filter(p =>
+                p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 p.category.toLowerCase().includes(searchQuery.toLowerCase())
             );
             setFilteredProducts(results);
@@ -55,13 +60,15 @@ const Navbar = () => {
 
     // Global Scroll Lock (Search Modal only, AuthModal handles its own)
     useEffect(() => {
-        if (isSearchOpen) {
+        if (isSearchOpen || isWishlistOpen) {
             document.body.style.overflow = "hidden";
-            setTimeout(() => searchInputRef.current?.focus(), 100);
+            if (isSearchOpen) {
+                setTimeout(() => searchInputRef.current?.focus(), 100);
+            }
         } else if (!isAuthOpen) {
             document.body.style.overflow = "auto";
         }
-    }, [isSearchOpen, isAuthOpen]);
+    }, [isSearchOpen, isAuthOpen, isWishlistOpen]);
 
     const toggleSubmenu = (name) => {
         setActiveSubmenu(activeSubmenu === name ? null : name);
@@ -95,6 +102,7 @@ const Navbar = () => {
                     <DesktopNav navLinks={navLinks} />
                     <ActionIcons
                         setIsSearchOpen={setIsSearchOpen}
+                        setIsWishlistOpen={setIsWishlistOpen}
                         handleAuthClick={handleAuthClick}
                         isOpen={isOpen}
                         setIsOpen={setIsOpen}
@@ -127,6 +135,11 @@ const Navbar = () => {
             <AuthModal
                 isOpen={isAuthOpen}
                 onClose={() => setIsAuthOpen(false)}
+            />
+
+            <WishlistSidebar
+                isOpen={isWishlistOpen}
+                onClose={() => setIsWishlistOpen(false)}
             />
         </>
     );

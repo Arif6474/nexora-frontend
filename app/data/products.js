@@ -7,6 +7,12 @@ export const allProducts = [
         originalPrice: 399,
         discount: 25,
         image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&h=533&fit=crop",
+        images: [
+            "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&h=533&fit=crop",
+            "https://images.unsplash.com/photo-1594932224440-74693226f507?w=400&h=533&fit=crop",
+            "https://images.unsplash.com/photo-1551486455-6cb3145459f2?w=400&h=533&fit=crop",
+            "https://images.unsplash.com/photo-1594932224440-74693226f507?w=400&h=533&fit=crop"
+        ],
         rating: 4.8,
         reviews: 124,
         badge: "New",
@@ -24,6 +30,11 @@ export const allProducts = [
         price: 149,
         originalPrice: null,
         image: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=533&fit=crop",
+        images: [
+            "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=533&fit=crop",
+            "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=533&fit=crop",
+            "https://images.unsplash.com/photo-1506152983158-b4a74a01c721?w=400&h=533&fit=crop"
+        ],
         rating: 4.5,
         reviews: 89,
         category: "Men",

@@ -1,12 +1,14 @@
-import React from "react";
-import { Search, User, ShoppingBag, X, Menu } from "lucide-react";
+import { Search, User, ShoppingBag, X, Menu, Heart } from "lucide-react";
+import { useWishlist } from "@/context/WishlistContext";
 
 const ActionIcons = ({
     setIsSearchOpen,
+    setIsWishlistOpen,
     handleAuthClick,
     isOpen,
     setIsOpen
 }) => {
+    const { wishlist } = useWishlist();
     return (
         <div className="flex items-center gap-1 sm:gap-4">
             <button
@@ -14,6 +16,15 @@ const ActionIcons = ({
                 className="p-2 sm:p-2.5 text-stone-500 hover:text-emerald-700 hover:bg-stone-100/50 rounded-full transition-all duration-300"
             >
                 <Search className="w-5.5 h-5.5" />
+            </button>
+            <button
+                onClick={() => setIsWishlistOpen(true)}
+                className="relative p-2 sm:p-2.5 text-stone-500 hover:text-emerald-700 hover:bg-stone-100/50 rounded-full transition-all duration-300 group"
+            >
+                <Heart className="w-5.5 h-5.5 group-hover:fill-emerald-700/10 transition-all" />
+                {wishlist.length > 0 && (
+                    <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-emerald-600 rounded-full border-2 border-white animate-pulse" />
+                )}
             </button>
             <button
                 onClick={handleAuthClick}

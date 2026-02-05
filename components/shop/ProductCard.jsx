@@ -1,12 +1,11 @@
-"use client";
-
-import React, { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
+'use client'
 import { ShoppingCart, Heart, Eye, Star } from "lucide-react";
+import { useWishlist } from "@/context/WishlistContext";
+import Link from "next/link";
 
-const ProductCard = ({ product }) => {
-    const [isWishlisted, setIsWishlisted] = useState(false);
+const ProductCard = ({ product, onQuickView }) => {
+    const { toggleWishlist, isInWishlist } = useWishlist();
+    const isWishlisted = isInWishlist(product.id);
     const {
         id,
         name,
@@ -45,13 +44,19 @@ const ProductCard = ({ product }) => {
 
                 {/* Quick Actions Overlay */}
                 <div className="absolute inset-0 bg-stone-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
-                    <button className="w-12 h-12 rounded-full bg-white hover:bg-emerald-600 flex items-center justify-center transition-all hover:scale-110 shadow-lg group/btn">
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            onQuickView?.(product);
+                        }}
+                        className="w-12 h-12 rounded-full bg-white hover:bg-emerald-600 flex items-center justify-center transition-all hover:scale-110 shadow-lg group/btn"
+                    >
                         <Eye className="w-5 h-5 text-stone-900 group-hover/btn:text-white transition-colors" />
                     </button>
                     <button
                         onClick={(e) => {
                             e.preventDefault();
-                            setIsWishlisted(!isWishlisted);
+                            toggleWishlist(product.id);
                         }}
                         className="w-12 h-12 rounded-full bg-white hover:bg-emerald-600 flex items-center justify-center transition-all hover:scale-110 shadow-lg group/btn"
                     >
@@ -78,8 +83,8 @@ const ProductCard = ({ product }) => {
                             <Star
                                 key={i}
                                 className={`w-3.5 h-3.5 ${i < Math.floor(rating)
-                                        ? "fill-amber-400 text-amber-400"
-                                        : "fill-stone-200 text-stone-200"
+                                    ? "fill-amber-400 text-amber-400"
+                                    : "fill-stone-200 text-stone-200"
                                     }`}
                             />
                         ))}

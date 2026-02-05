@@ -18,7 +18,9 @@ import {
 import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/shop/ProductCard";
+import QuickViewModal from "@/components/shop/QuickViewModal";
 import { allProducts } from "../../data/products";
+import { useWishlist } from "@/context/WishlistContext";
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -26,12 +28,24 @@ const ProductDetails = () => {
     const [selectedColor, setSelectedColor] = useState("");
     const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState("description");
+    const [mainImage, setMainImage] = useState("");
+    const [quickViewProduct, setQuickViewProduct] = useState(null);
     const sliderRef = useRef(null);
     const [isPaused, setIsPaused] = useState(false);
+    const { toggleWishlist, isInWishlist } = useWishlist();
 
     const product = useMemo(() => {
         return allProducts.find((p) => p.id.toString() === id);
     }, [id]);
+
+    useEffect(() => {
+        if (product) setMainImage(product.image);
+    }, [product]);
+
+    const productImages = useMemo(() => {
+        if (!product) return [];
+        return product.images || [product.image];
+    }, [product]);
 
     const relatedProducts = useMemo(() => {
         if (!product) return [];
@@ -103,7 +117,7 @@ const ProductDetails = () => {
                     <div className="space-y-6">
                         <div className="aspect-[4/5] bg-white rounded-[40px] overflow-hidden border border-stone-200 shadow-2xl shadow-stone-200/50 group relative">
                             <img
-                                src={product.image}
+                                src={mainImage}
                                 alt={product.name}
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             />
@@ -113,11 +127,15 @@ const ProductDetails = () => {
                                 </div>
                             )}
                         </div>
-                        {/* Thumbnails (Static for now) */}
+                        {/* Thumbnails */}
                         <div className="grid grid-cols-4 gap-4">
-                            {[1, 2, 3, 4].map((i) => (
-                                <div key={i} className={`aspect-square bg-white rounded-2xl border-2 transition-all cursor-pointer overflow-hidden ${i === 1 ? "border-emerald-600" : "border-stone-100 hover:border-stone-200"}`}>
-                                    <img src={product.image} className="w-full h-full object-cover opacity-60 hover:opacity-100 transition-opacity" />
+                            {productImages.map((img, i) => (
+                                <div
+                                    key={i}
+                                    onClick={() => setMainImage(img)}
+                                    className={`aspect-square bg-white rounded-2xl border-2 transition-all cursor-pointer overflow-hidden ${mainImage === img ? "border-emerald-600 scale-95" : "border-stone-100 hover:border-stone-200"}`}
+                                >
+                                    <img src={img} className="w-full h-full object-cover opacity-60 hover:opacity-100 transition-opacity" />
                                 </div>
                             ))}
                         </div>
@@ -223,8 +241,11 @@ const ProductDetails = () => {
                                 <ShoppingCart className="w-5 h-5" />
                                 Add To Portfolio
                             </button>
-                            <button className="w-16 h-16 flex items-center justify-center border-2 border-stone-100 rounded-2xl text-stone-400 hover:text-emerald-600 hover:border-emerald-600 transition-all group">
-                                <Heart className="w-6 h-6 group-hover:fill-emerald-600 transition-all" />
+                            <button
+                                onClick={() => toggleWishlist(product.id)}
+                                className={`w-16 h-16 flex items-center justify-center border-2 rounded-2xl transition-all group ${isInWishlist(product.id) ? "border-emerald-600 bg-emerald-50 text-emerald-600" : "border-stone-100 text-stone-400 hover:text-emerald-600 hover:border-emerald-600"}`}
+                            >
+                                <Heart className={`w-6 h-6 group-hover:fill-emerald-600 transition-all ${isInWishlist(product.id) ? "fill-emerald-600" : ""}`} />
                             </button>
                         </div>
 
@@ -316,7 +337,10 @@ const ProductDetails = () => {
                     >
                         {relatedProducts.map((p) => (
                             <div key={p.id} className="min-w-[280px] sm:min-w-[320px] lg:min-w-[350px]">
-                                <ProductCard product={p} />
+                                <ProductCard
+                                    product={p}
+                                    onQuickView={setQuickViewProduct}
+                                />
                             </div>
                         ))}
                     </div>
@@ -324,6 +348,12 @@ const ProductDetails = () => {
             </div>
 
             <Footer />
+
+            <QuickViewModal
+                product={quickViewProduct}
+                isOpen={!!quickViewProduct}
+                onClose={() => setQuickViewProduct(null)}
+            />
         </div>
     );
 };

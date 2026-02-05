@@ -6,6 +6,7 @@ import Footer from "../../components/Footer";
 import FilterSection from "../../components/shop/FilterSection";
 import SortDropdown from "../../components/shop/SortDropdown";
 import ProductCard from "../../components/shop/ProductCard";
+import QuickViewModal from "../../components/shop/QuickViewModal";
 import { Grid3x3, LayoutGrid } from "lucide-react";
 import { allProducts } from "../data/products";
 
@@ -13,6 +14,7 @@ const ShopPage = () => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [sortBy, setSortBy] = useState("featured");
     const [viewMode, setViewMode] = useState("4-col"); // 4-col or 3-col
+    const [quickViewProduct, setQuickViewProduct] = useState(null);
 
     // Filter state
     const [selectedFilters, setSelectedFilters] = useState({
@@ -175,7 +177,11 @@ const ShopPage = () => {
                                         }`}
                                 >
                                     {filteredAndSortedProducts.map((product) => (
-                                        <ProductCard key={product.id} product={product} />
+                                        <ProductCard
+                                            key={product.id}
+                                            product={product}
+                                            onQuickView={setQuickViewProduct}
+                                        />
                                     ))}
                                 </div>
                             )}
@@ -206,6 +212,12 @@ const ShopPage = () => {
             </div>
 
             <Footer />
+
+            <QuickViewModal
+                product={quickViewProduct}
+                isOpen={!!quickViewProduct}
+                onClose={() => setQuickViewProduct(null)}
+            />
         </div>
     );
 };
