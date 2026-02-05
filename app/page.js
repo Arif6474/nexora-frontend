@@ -5,6 +5,7 @@ import Hero from '../components/Hero'
 import Footer from '../components/Footer'
 import TrendingProducts from '../components/home/TrendingProducts'
 import NewArrivals from '../components/home/NewArrivals'
+import Testimonials from '../components/home/Testimonials'
 import QuickViewModal from '../components/shop/QuickViewModal'
 
 function Home() {
@@ -17,6 +18,8 @@ function Home() {
       <TrendingProducts onQuickView={setSelectedProduct} />
 
       <NewArrivals onQuickView={setSelectedProduct} />
+
+      <Testimonials />
 
       <Footer />
 
