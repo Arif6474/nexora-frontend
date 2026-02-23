@@ -5,17 +5,18 @@ import Link from "next/link";
 import { Lock, Eye, EyeOff, Loader2, ShoppingBag, CheckCircle2, ShieldCheck } from "lucide-react";
 import axios from "axios";
 import { RESET_PASSWORD_API } from "@/utils/APIs";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
-export default function ResetPasswordPage() {
+export default function ResetPasswordPage({ params }) {
+    const { token } = React.use(params);
     const [formData, setFormData] = useState({ password: "", confirmPassword: "" });
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const searchParams = useSearchParams();
-    const token = searchParams.get("token");
+    // const searchParams = useSearchParams();
+    // const token = searchParams.get("token");
     const router = useRouter();
 
     useEffect(() => {
@@ -47,7 +48,7 @@ export default function ResetPasswordPage() {
 
         setIsLoading(true);
         try {
-            const res = await axios.post(RESET_PASSWORD_API, {
+            const res = await axios.patch(RESET_PASSWORD_API, {
                 token: token,
                 newPassword: formData.password
             });
@@ -74,7 +75,7 @@ export default function ResetPasswordPage() {
                             <ShoppingBag className="text-white w-7 h-7" />
                         </div>
                         <span className="text-3xl font-black text-stone-900 tracking-tighter uppercase italic">
-                            Drop<span className="text-emerald-700">Shop</span>
+                            Nex<span className="text-emerald-700">ora</span>
                         </span>
                     </Link>
                 </div>

@@ -1,4 +1,5 @@
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL + 'api/customerApp/public/'
+export const PROTECTED_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL + 'api/customerApp/protected/'
 
 // User APIs
 export const AUTH_API = API_BASE_URL + 'auth/'
@@ -8,4 +9,7 @@ export const FORGOT_PASSWORD_API = AUTH_API + 'forgotPassword/'
 export const RESET_PASSWORD_API = AUTH_API + 'resetPassword/'
 export const EMAIL_FROM_TOKEN_API = AUTH_API + 'getEmailFromToken/'
 export const LOGIN_WITH_GOOGLE_API = AUTH_API + 'loginWithGoogle/'
+
+// Protected APIs
+export const UPDATE_PROFILE_API = PROTECTED_API_BASE_URL + 'updateProfile/'
 

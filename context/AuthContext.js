@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
-import { LOGIN_API, REGISTER_API, LOGIN_WITH_GOOGLE_API } from "@/utils/APIs";
+import { LOGIN_API, REGISTER_API, LOGIN_WITH_GOOGLE_API, UPDATE_PROFILE_API } from "@/utils/APIs";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 
@@ -98,8 +98,26 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
-    const updateProfile = (updatedData) => {
-        setUser(prev => ({ ...prev, ...updatedData }));
+    const updateProfile = async (updatedData) => {
+        try {
+            const res = await axios.patch(UPDATE_PROFILE_API, updatedData, {
+                headers: {
+                    Authorization: `Bearer ${user?.token}`
+                }
+            });
+            if (res.status === 200) {
+                const updatedUser = { ...user, ...res.data };
+                setUser(updatedUser);
+                // Notification is handled in the component for more specific feedback if needed, 
+                // but adding it here for consistency with login/register
+                toast.success("Profile updated successfully!");
+                return updatedUser;
+            }
+        } catch (error) {
+            console.error("Profile update error:", error);
+            toast.error(error.response?.data?.message || "Failed to update profile. Please try again.");
+            throw error;
+        }
     };
 
     return (
