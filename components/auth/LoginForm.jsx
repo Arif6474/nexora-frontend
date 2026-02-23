@@ -30,8 +30,10 @@ const LoginForm = ({ onSwitch, onForgotPassword, onSuccess }) => {
         try {
             await login(formData.email, formData.password);
             onSuccess?.();
+            // Toast notifications are handled in AuthContext
         } catch (error) {
-            setErrors({ submit: "Failed to login. Please check your credentials." });
+            // Error is handled in AuthContext with toast
+            console.error("Login failed", error);
         } finally {
             setIsLoading(false);
         }

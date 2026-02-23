@@ -178,7 +178,7 @@ useEffect(() => {
                                     }
                                     addToCart(product, selectedSize, selectedColor, quantity);
                                 }}
-                                className={`flex-1 py-4 font-black uppercase tracking-[0.2em] text-[10px] rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl flex items-center justify-center gap-2 ${showError && (!selectedSize || !selectedColor) ? "bg-red-500 shadow-red-500/20" : "bg-stone-900 shadow-stone-900/20 hover:bg-emerald-700"}`}
+                                className={`flex-1 py-4 font-black uppercase tracking-[0.2em] text-[10px] rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl flex items-center justify-center gap-2 ${showError && (!selectedSize || !selectedColor) ? "bg-red-500 shadow-red-500/20" : "bg-stone-900 text-white shadow-stone-900/20 hover:bg-emerald-700"}`}
                             >
                                 <ShoppingCart className="w-4 h-4" />
                                 {showError && (!selectedSize || !selectedColor) ? "Select Options" : "Add To Basket"}

@@ -3,6 +3,9 @@
 import React, { useState } from "react";
 import { Mail, Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
 import FormInput from "./FormInput";
+import axios from "axios";
+import { FORGOT_PASSWORD_API } from "@/utils/APIs";
+import toast from "react-hot-toast";
 
 const ForgotPasswordForm = ({ onBack, onSuccess }) => {
     const [email, setEmail] = useState("");
@@ -23,16 +26,23 @@ const ForgotPasswordForm = ({ onBack, onSuccess }) => {
         return true;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validate()) return;
 
         setIsLoading(true);
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            const res = await axios.post(FORGOT_PASSWORD_API, { email });
+            if (res.status === 200) {
+                setIsSubmitted(true);
+                toast.success("Reset instructions sent to your email!");
+            }
+        } catch (err) {
+            console.error("Forgot password error:", err);
+            toast.error(err.response?.data?.message || "Failed to send reset link. Please try again.");
+        } finally {
             setIsLoading(false);
-            setIsSubmitted(true);
-        }, 1500);
+        }
     };
 
     if (isSubmitted) {

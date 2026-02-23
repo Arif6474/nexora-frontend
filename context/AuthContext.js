@@ -1,16 +1,21 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
+import { LOGIN_API, REGISTER_API, LOGIN_WITH_GOOGLE_API } from "@/utils/APIs";
+import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const { data: session, status } = useSession();
 
     // Load user from localStorage on mount
     useEffect(() => {
-        const savedUser = localStorage.getItem("nexora-user");
+        const savedUser = localStorage.getItem("user");
         if (savedUser) {
             try {
                 setUser(JSON.parse(savedUser));
@@ -24,43 +29,69 @@ export const AuthProvider = ({ children }) => {
     // Save user to localStorage when it changes
     useEffect(() => {
         if (user) {
-            localStorage.setItem("nexora-user", JSON.stringify(user));
+            localStorage.setItem("user", JSON.stringify(user));
         } else {
-            localStorage.removeItem("nexora-user");
+            localStorage.removeItem("user");
         }
     }, [user]);
 
+    // Google Login synchronization
+    useEffect(() => {
+        const syncGoogleUser = async () => {
+            if (status === "authenticated" && session?.user?.email && session?.user?.name) {
+                try {
+                    const res = await axios.post(LOGIN_WITH_GOOGLE_API, {
+                        email: session.user.email,
+                        name: session.user.name,
+                        phone: session.user.phone || "",
+                        image: session.user.image || "",
+                    });
+
+                    if (res.status === 200) {
+                        const userData = res.data;
+                        setUser(userData);
+                        // toast.success("Google login successful!");
+                    }
+                } catch (err) {
+                    console.error("Google login synchronization error:", err);
+                }
+            }
+        };
+
+        syncGoogleUser();
+    }, [status, session]);
+
     const login = async (email, password) => {
-        // Simulate API call
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const newUser = {
-                    id: "user-123",
-                    name: "John Doe",
-                    email: email,
-                    phone: "+880 1234 567 890",
-                    address: "123 Luxury Lane, Banani, Dhaka",
-                    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop"
-                };
-                setUser(newUser);
-                resolve(newUser);
-            }, 1000);
-        });
+        try {
+            const res = await axios.post(LOGIN_API, { email, password });
+            if (res.status === 200) {
+                const userData = res.data;
+                setUser(userData);
+                toast.success("Logged in successfully!");
+                return userData;
+            }
+        } catch (error) {
+            console.error("Login error:", error);
+            toast.error(error.response?.data?.message || "Invalid credentials. Please try again.");
+            throw error;
+        }
     };
 
     const register = async (userData) => {
-        // Simulate API call
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const newUser = {
-                    id: `user-${Math.random().toString(36).substr(2, 9)}`,
-                    ...userData,
-                    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop"
-                };
+        try {
+            const res = await axios.post(REGISTER_API, userData);
+            if (res.status === 201) {
+                const newUser = res.data;
+                console.log(newUser);
                 setUser(newUser);
-                resolve(newUser);
-            }, 1000);
-        });
+                toast.success("Account created successfully!");
+                return newUser;
+            }
+        } catch (error) {
+            console.error("Registration error:", error);
+            toast.error(error.response?.data?.message || "Failed to create account. Please try again.");
+            throw error;
+        }
     };
 
     const logout = () => {

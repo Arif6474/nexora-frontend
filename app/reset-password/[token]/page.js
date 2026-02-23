@@ -1,8 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Lock, Eye, EyeOff, Loader2, ShoppingBag, CheckCircle2, ShieldCheck } from "lucide-react";
+import axios from "axios";
+import { RESET_PASSWORD_API } from "@/utils/APIs";
+import { useSearchParams, useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function ResetPasswordPage() {
     const [formData, setFormData] = useState({ password: "", confirmPassword: "" });
@@ -10,6 +14,16 @@ export default function ResetPasswordPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const searchParams = useSearchParams();
+    const token = searchParams.get("token");
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!token) {
+            toast.error("Invalid or missing reset token.");
+            // router.push("/"); // Optionally redirect if no token
+        }
+    }, [token, router]);
 
     const validate = () => {
         let newErrors = {};
@@ -23,16 +37,31 @@ export default function ResetPasswordPage() {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validate()) return;
+        if (!token) {
+            toast.error("No reset token found. Please request a new link.");
+            return;
+        }
 
         setIsLoading(true);
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            const res = await axios.post(RESET_PASSWORD_API, {
+                token: token,
+                newPassword: formData.password
+            });
+
+            if (res.status === 200) {
+                setIsSuccess(true);
+                toast.success("Password reset successfully!");
+            }
+        } catch (err) {
+            console.error("Reset password error:", err);
+            toast.error(err.response?.data?.message || "Failed to reset password. Please try again.");
+        } finally {
             setIsLoading(false);
-            setIsSuccess(true);
-        }, 1500);
+        }
     };
 
     return (

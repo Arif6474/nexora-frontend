@@ -259,7 +259,7 @@ const ProductDetails = () => {
                             </div>
                             <button
                                 onClick={handleAddToCart}
-                                className={`flex-1 py-5 font-black uppercase tracking-[0.2em] text-sm rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-2xl flex items-center justify-center gap-3 ${showError && (!currentSize || !currentColor) ? "bg-red-500 shadow-red-500/20" : "bg-stone-900 shadow-stone-900/20 hover:bg-emerald-700"}`}
+                                className={`flex-1 py-5 font-black uppercase tracking-[0.2em] text-sm rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-2xl flex items-center justify-center gap-3 ${showError && (!currentSize || !currentColor) ? "bg-red-500 shadow-red-500/20" : "bg-stone-900 text-white shadow-stone-900/20 hover:bg-emerald-700"}`}
                             >
                                 <ShoppingCart className="w-5 h-5" />
                                 {showError && (!currentSize || !currentColor) ? "Select Options" : "Add To Basket"}

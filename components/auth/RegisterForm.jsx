@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { Mail, Lock, Loader2, AtSign, ShieldCheck } from "lucide-react";
+import { Mail, Lock, Loader2, AtSign, ShieldCheck, Phone } from "lucide-react";
 import FormInput from "./FormInput";
 import { useAuth } from "@/context/AuthContext";
 
 const RegisterForm = ({ onSwitch, onSuccess }) => {
-    const [formData, setFormData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+    const [formData, setFormData] = useState({ name: "", email: "", phone: "", password: "", confirmPassword: "" });
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const { register } = useAuth();
@@ -17,6 +17,8 @@ const RegisterForm = ({ onSwitch, onSuccess }) => {
 
         if (!formData.email) newErrors.email = "Email is required";
         else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Invalid email format";
+
+        if (!formData.phone) newErrors.phone = "Phone is required";
 
         if (!formData.password) newErrors.password = "Password is required";
         else if (formData.password.length < 6) newErrors.password = "Min 6 characters required";
@@ -38,11 +40,13 @@ const RegisterForm = ({ onSwitch, onSuccess }) => {
             await register({
                 name: formData.name,
                 email: formData.email,
-                password: formData.password
+                phone: formData.phone,
+                password: formData.password,
+                confirmPassword: formData.confirmPassword
             });
             onSuccess?.();
         } catch (error) {
-            setErrors({ submit: "Failed to create account. Please try again." });
+            console.error("Registration failed", error);
         } finally {
             setIsLoading(false);
         }
@@ -66,6 +70,15 @@ const RegisterForm = ({ onSwitch, onSuccess }) => {
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     icon={Mail}
                     error={errors.email}
+                    className="pt-1"
+                />
+
+                <FormInput
+                    placeholder="Phone Number"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    icon={Phone}
+                    error={errors.phone}
                     className="pt-1"
                 />
 
