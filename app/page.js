@@ -6,9 +6,13 @@ import TrendingProducts from '../components/home/TrendingProducts'
 import NewArrivals from '../components/home/NewArrivals'
 import Testimonials from '../components/home/Testimonials'
 import QuickViewModal from '../components/shop/QuickViewModal'
+import useFetch from '@/utils/hooks/useFetch'
+import { HOME_API } from '@/utils/APIs';
+
 
 function Home() {
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const { data, isLoading } = useFetch(HOME_API);
 
   return (
     <main className="min-h-screen bg-stone-50">
@@ -16,7 +20,7 @@ function Home() {
 
       <TrendingProducts onQuickView={setSelectedProduct} />
 
-      <NewArrivals onQuickView={setSelectedProduct} />
+      <NewArrivals onQuickView={setSelectedProduct} products={data?.latestProducts} />
 
       <Testimonials />
 

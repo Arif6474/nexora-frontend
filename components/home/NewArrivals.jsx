@@ -2,17 +2,13 @@
 
 import React, { useRef } from "react";
 import { Sparkles, ArrowRight, ArrowLeft, Eye, Heart } from "lucide-react";
-import { allProducts } from "@/app/data/products";
 import Link from "next/link";
 import { useWishlist } from "@/context/WishlistContext";
+import { takaFormator } from "@/utils/takaFormator";
 
-const NewArrivals = ({ onQuickView }) => {
+const NewArrivals = ({ onQuickView, products = [] }) => {
     const scrollContainerRef = useRef(null);
     const { toggleWishlist, isInWishlist } = useWishlist();
-
-    // Curated new arrivals (IDs 13, 14, 15, 16, 21, 22)
-    const arrivalIds = [13, 14, 15, 16, 21, 22];
-    const products = allProducts.filter(p => arrivalIds.includes(p.id));
 
     const scroll = (direction) => {
         if (!scrollContainerRef.current) return;
@@ -61,11 +57,11 @@ const NewArrivals = ({ onQuickView }) => {
                 >
                     {products.map((product, idx) => (
                         <div
-                            key={product.id}
+                            key={product._id || product.id}
                             className="relative min-w-[300px] sm:min-w-[400px] aspect-4/5 group snap-start overflow-hidden rounded-[40px] bg-white border border-stone-100 shadow-xl shadow-stone-200/50"
                         >
                             <img
-                                src={product.image}
+                                src={process.env.NEXT_PUBLIC_SPACES_URL + product.image}
                                 alt={product.name}
                                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                             />
@@ -73,13 +69,13 @@ const NewArrivals = ({ onQuickView }) => {
                             {/* Actions (Wishlist & Quick View) */}
                             <div className="absolute top-6 left-6 flex flex-col gap-3 z-20">
                                 <button
-                                    onClick={() => toggleWishlist(product.id)}
-                                    className={`w-12 h-12 rounded-full backdrop-blur-md flex items-center justify-center transition-all transform -translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 duration-500 border ${isInWishlist(product.id)
+                                    onClick={() => toggleWishlist(product._id || product.id)}
+                                    className={`w-12 h-12 rounded-full backdrop-blur-md flex items-center justify-center transition-all transform -translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 duration-500 border ${isInWishlist(product._id || product.id)
                                         ? "bg-stone-900 border-stone-900 text-white"
                                         : "bg-white/10 border-white/20 text-white hover:bg-white hover:text-stone-900"
                                         }`}
                                 >
-                                    <Heart className={`w-5 h-5 ${isInWishlist(product.id) ? "fill-current" : ""}`} />
+                                    <Heart className={`w-5 h-5 ${isInWishlist(product._id || product.id) ? "fill-current" : ""}`} />
                                 </button>
                                 <button
                                     onClick={() => onQuickView(product)}
@@ -97,12 +93,12 @@ const NewArrivals = ({ onQuickView }) => {
                                         <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400">Newly Sourced</span>
                                     </div>
                                     <h3 className="text-xl font-black text-white uppercase tracking-tight leading-none mb-4">
-                                        {product.name}
+                                        {product.title}
                                     </h3>
                                     <div className="flex justify-between items-end">
-                                        <span className="text-2xl font-serif italic text-white">${product.price}</span>
+                                        <span className="text-2xl font-serif italic text-white">{takaFormator(product.price)}</span>
                                         <Link
-                                            href={`/product/${product.id}`}
+                                            href={`/product/${product._id || product.id}`}
                                             className="px-6 py-3 bg-white text-stone-900 rounded-xl font-black uppercase tracking-widest text-[9px] hover:bg-emerald-600 hover:text-white transition-all transform translate-y-8 group-hover:translate-y-0 duration-500 opacity-0 group-hover:opacity-100"
                                         >
                                             View Piece
