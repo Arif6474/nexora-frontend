@@ -15,8 +15,7 @@ import {
     Plus,
     Share2
 } from "lucide-react";
-import Navbar from "@/components/navbar/Navbar";
-import Footer from "@/components/Footer";
+
 import ProductCard from "@/components/shop/ProductCard";
 import QuickViewModal from "@/components/shop/QuickViewModal";
 import { allProducts } from "../../data/products";
@@ -110,7 +109,6 @@ const ProductDetails = () => {
 
     return (
         <div className="min-h-screen bg-stone-50">
-            <Navbar />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
                 {/* Breadcrumbs */}
@@ -369,8 +367,6 @@ const ProductDetails = () => {
                     </div>
                 </div>
             </div>
-
-            <Footer />
 
             <QuickViewModal
                 product={quickViewProduct}

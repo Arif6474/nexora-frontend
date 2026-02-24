@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import Navbar from "../../components/navbar/Navbar";
-import Footer from "../../components/Footer";
+
 import FilterSection from "../../components/shop/FilterSection";
 import SortDropdown from "../../components/shop/SortDropdown";
 import ProductCard from "../../components/shop/ProductCard";
@@ -97,7 +96,6 @@ const ShopPage = () => {
 
     return (
         <div className="min-h-screen bg-stone-50">
-            <Navbar />
 
             {/* Page Header */}
             <div className="bg-white border-b border-stone-200">
@@ -211,7 +209,6 @@ const ShopPage = () => {
                 </div>
             </div>
 
-            <Footer />
 
             <QuickViewModal
                 product={quickViewProduct}

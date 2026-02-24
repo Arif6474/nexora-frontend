@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react'
 import Hero from '../components/Hero'
-import Footer from '../components/Footer'
 import TrendingProducts from '../components/home/TrendingProducts'
 import NewArrivals from '../components/home/NewArrivals'
 import Testimonials from '../components/home/Testimonials'
@@ -20,8 +19,6 @@ function Home() {
       <NewArrivals onQuickView={setSelectedProduct} />
 
       <Testimonials />
-
-      <Footer />
 
       <QuickViewModal
         product={selectedProduct}
