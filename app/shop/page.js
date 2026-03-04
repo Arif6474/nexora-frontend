@@ -1,18 +1,18 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-
+import React, { useState } from "react";
 import FilterSection from "../../components/shop/FilterSection";
 import SortDropdown from "../../components/shop/SortDropdown";
 import ProductCard from "../../components/shop/ProductCard";
 import QuickViewModal from "../../components/shop/QuickViewModal";
-import { Grid3x3, LayoutGrid } from "lucide-react";
-import { allProducts } from "../data/products";
+import { Grid3x3, LayoutGrid, Loader2 } from "lucide-react";
+import useFetch from "@/utils/hooks/useFetch";
+import { GET_ALL_PRODUCTS_WITH_QUERY_API } from "@/utils/APIs";
 
 const ShopPage = () => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [sortBy, setSortBy] = useState("featured");
-    const [viewMode, setViewMode] = useState("4-col"); // 4-col or 3-col
+    const [sortBy, setSortBy] = useState("newest");
+    const [viewMode, setViewMode] = useState("4-col");
     const [quickViewProduct, setQuickViewProduct] = useState(null);
 
     // Filter state
@@ -20,83 +20,20 @@ const ShopPage = () => {
         category: "",
         subcategory: "",
         brand: "",
-        size: "",
-        color: "",
-        discount: "",
     });
 
+    // Build query parameters
+    const queryParams = new URLSearchParams();
+    if (selectedFilters.category) queryParams.append("category", selectedFilters.category);
+    if (selectedFilters.subcategory) queryParams.append("subcategory", selectedFilters.subcategory);
+    if (selectedFilters.brand) queryParams.append("brand", selectedFilters.brand);
+    if (sortBy) queryParams.append("sortBy", sortBy);
 
-    // Filter and sort products
-    const filteredAndSortedProducts = useMemo(() => {
-        let filtered = [...allProducts];
-
-        // Apply category filter
-        if (selectedFilters.category) {
-            filtered = filtered.filter((product) =>
-                product.category === selectedFilters.category
-            );
-        }
-
-        // Apply subcategory filter
-        if (selectedFilters.subcategory) {
-            filtered = filtered.filter((product) =>
-                product.subcategory === selectedFilters.subcategory
-            );
-        }
-
-        // Apply brand filter
-        if (selectedFilters.brand) {
-            filtered = filtered.filter((product) =>
-                product.brand === selectedFilters.brand
-            );
-        }
-
-        // Apply size filter
-        if (selectedFilters.size) {
-            filtered = filtered.filter((product) =>
-                product.size === selectedFilters.size
-            );
-        }
-
-        // Apply color filter
-        if (selectedFilters.color) {
-            filtered = filtered.filter((product) =>
-                product.color === selectedFilters.color
-            );
-        }
-
-        // Apply discount filter
-        if (selectedFilters.discount) {
-            const minDiscount = parseInt(selectedFilters.discount);
-            filtered = filtered.filter((product) =>
-                (product.discount || 0) >= minDiscount
-            );
-        }
-
-        // Apply sorting
-        switch (sortBy) {
-            case "price-low":
-                filtered.sort((a, b) => a.price - b.price);
-                break;
-            case "price-high":
-                filtered.sort((a, b) => b.price - a.price);
-                break;
-            case "newest":
-                filtered.reverse();
-                break;
-            case "best-selling":
-                filtered.sort((a, b) => b.reviews - a.reviews);
-                break;
-            default:
-                break;
-        }
-
-        return filtered;
-    }, [selectedFilters, sortBy]);
+    const url = `${GET_ALL_PRODUCTS_WITH_QUERY_API}?${queryParams.toString()}`;
+    const { data: products = [], isLoading } = useFetch(url);
 
     return (
         <div className="min-h-screen bg-stone-50">
-
             {/* Page Header */}
             <div className="bg-white border-b border-stone-200">
                 <div className="max-w-[1600px] mx-auto px-4 sm:px-8 py-8 sm:py-12">
@@ -127,7 +64,7 @@ const ShopPage = () => {
                             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                 <div className="flex items-center gap-4">
                                     <p className="text-sm font-medium text-stone-600">
-                                        Showing <span className="font-black text-stone-900">{filteredAndSortedProducts.length}</span> of <span className="font-black text-stone-900">{allProducts.length}</span> products
+                                        Showing <span className="font-black text-stone-900">{products.length}</span> products
                                     </p>
                                 </div>
 
@@ -162,7 +99,11 @@ const ShopPage = () => {
 
                         {/* Product Grid */}
                         <div className="p-4 sm:p-8">
-                            {filteredAndSortedProducts.length === 0 ? (
+                            {isLoading ? (
+                                <div className="py-20 flex justify-center items-center">
+                                    <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+                                </div>
+                            ) : products.length === 0 ? (
                                 <div className="py-20 text-center">
                                     <p className="text-2xl font-black text-stone-400 mb-2">No products found</p>
                                     <p className="text-stone-500">Try adjusting your filters</p>
@@ -174,9 +115,9 @@ const ShopPage = () => {
                                         : "grid-cols-2 lg:grid-cols-3"
                                         }`}
                                 >
-                                    {filteredAndSortedProducts.map((product) => (
+                                    {products.map((product) => (
                                         <ProductCard
-                                            key={product.id}
+                                            key={product._id}
                                             product={product}
                                             onQuickView={setQuickViewProduct}
                                         />
@@ -208,7 +149,6 @@ const ShopPage = () => {
                     </div>
                 </div>
             </div>
-
 
             <QuickViewModal
                 product={quickViewProduct}

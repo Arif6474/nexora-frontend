@@ -7,11 +7,10 @@ const SortDropdown = ({ value, onChange }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const sortOptions = [
-        { value: "featured", label: "Featured" },
-        { value: "price-low", label: "Price: Low to High" },
-        { value: "price-high", label: "Price: High to Low" },
         { value: "newest", label: "Newest First" },
-        { value: "best-selling", label: "Best Selling" },
+        { value: "oldest", label: "Oldest First" },
+        { value: "priceLowToHigh", label: "Price: Low to High" },
+        { value: "priceHighToLow", label: "Price: High to Low" },
     ];
 
     const selectedOption = sortOptions.find((opt) => opt.value === value) || sortOptions[0];
@@ -43,8 +42,8 @@ const SortDropdown = ({ value, onChange }) => {
                                 key={option.value}
                                 onClick={() => handleSelect(option)}
                                 className={`w-full px-4 py-3 text-left text-sm font-medium transition-colors flex items-center justify-between ${option.value === value
-                                        ? "bg-emerald-50 text-emerald-700"
-                                        : "text-stone-700 hover:bg-stone-50"
+                                    ? "bg-emerald-50 text-emerald-700"
+                                    : "text-stone-700 hover:bg-stone-50"
                                     }`}
                             >
                                 {option.label}

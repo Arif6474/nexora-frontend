@@ -5,10 +5,10 @@ import Link from "next/link";
 
 const ProductCard = ({ product, onQuickView }) => {
     const { toggleWishlist, isInWishlist } = useWishlist();
-    const isWishlisted = isInWishlist(product.id);
+    const isWishlisted = isInWishlist(product._id);
     const {
-        id,
-        name,
+        _id,
+        title,
         price,
         originalPrice,
         discount,
@@ -23,10 +23,10 @@ const ProductCard = ({ product, onQuickView }) => {
     return (
         <div className="group relative bg-white rounded-2xl overflow-hidden border border-stone-200 hover:border-emerald-500/30 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-900/10">
             {/* Image Container */}
-            <Link href={`/product/${id}`} className="relative block aspect-[3/4] overflow-hidden bg-stone-100">
+            <Link href={`/product/${_id}`} className="relative block aspect-[3/4] overflow-hidden bg-stone-100">
                 <img
-                    src={image || "/api/placeholder/400/533"}
-                    alt={name}
+                    src={process.env.NEXT_PUBLIC_SPACES_URL + image || "/api/placeholder/400/533"}
+                    alt={title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
 
@@ -56,7 +56,7 @@ const ProductCard = ({ product, onQuickView }) => {
                     <button
                         onClick={(e) => {
                             e.preventDefault();
-                            toggleWishlist(product.id);
+                            toggleWishlist(product._id);
                         }}
                         className="w-12 h-12 rounded-full bg-white hover:bg-emerald-600 flex items-center justify-center transition-all hover:scale-110 shadow-lg group/btn"
                     >
@@ -70,9 +70,9 @@ const ProductCard = ({ product, onQuickView }) => {
 
             {/* Product Info */}
             <div className="p-4">
-                <Link href={`/product/${id}`}>
+                <Link href={`/product/${_id}`}>
                     <h3 className="text-sm font-bold text-stone-900 mb-2 line-clamp-2 group-hover:text-emerald-600 transition-colors">
-                        {name}
+                        {title}
                     </h3>
                 </Link>
 

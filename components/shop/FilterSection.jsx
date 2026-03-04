@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronDown, ChevronUp, X, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, ChevronUp, X, SlidersHorizontal, Loader2 } from "lucide-react";
+import useFetch from "@/utils/hooks/useFetch";
+import { CATEGORIES_API, BRANDS_API, SUBCATEGORIES_BY_CATEGORY_API } from "@/utils/APIs";
 
 const FilterSection = ({ isOpen, onToggle, selectedFilters, onFilterChange }) => {
     const [expandedSections, setExpandedSections] = useState({
@@ -41,19 +43,17 @@ const FilterSection = ({ isOpen, onToggle, selectedFilters, onFilterChange }) =>
 
     const totalActiveFilters = Object.values(selectedFilters).filter(v => v !== "").length;
 
-    const categories = ["Men", "Kids", "Accessories", "Shoes"];
-    const subcategories = ["T-Shirts", "Jeans", "Dresses", "Jackets", "Sneakers", "Bags"];
-    const brands = ["Nike", "Adidas", "Zara", "H&M", "Gucci", "Prada", "Uniqlo"];
-    const sizes = ["S", "M", "L", "XL", "XXL", "40", "41", "42", "43", "44"];
-    const colors = [
-        { name: "Black", hex: "#000000" },
-        { name: "White", hex: "#FFFFFF", border: true },
-        { name: "Blue", hex: "#3B82F6" },
-        { name: "Emerald", hex: "#10B981" },
-        { name: "Beige", hex: "#F5F5DC" },
-        { name: "Stone", hex: "#78716C" },
-    ];
-    const discounts = ["10", "20", "30", "50"];
+    // Fetch dynamic data
+    const { data: categories = [], isLoading: isLoadingCats } = useFetch(CATEGORIES_API);
+    const { data: brands = [], isLoading: isLoadingBrands } = useFetch(BRANDS_API);
+
+    const { data: subcategories = [], isLoading: isLoadingSubcats } = useFetch(
+        selectedFilters.category ? `${SUBCATEGORIES_BY_CATEGORY_API}${selectedFilters.category}` : null,
+        !!selectedFilters.category
+    );
+
+    // Optional: Hide sizes, colors, and static discounts if not supported by backend.
+    // We'll keep them as empty arrays for now if unused, or remove them entirely from rendering.
 
     const FilterRadio = ({ label, checked, onChange, name }) => (
         <label className="flex items-center gap-3 py-2 cursor-pointer group">
@@ -87,51 +87,20 @@ const FilterSection = ({ isOpen, onToggle, selectedFilters, onFilterChange }) =>
             </button>
             {isExpanded && (
                 <div className="pb-4 space-y-1">
-                    {type === "color" ? (
-                        <div className="grid grid-cols-6 gap-3 pt-2">
-                            {items.map((color) => (
-                                <button
-                                    key={color.name}
-                                    onClick={() => handleFilterChange("color", color.name)}
-                                    className={`relative w-8 h-8 rounded-full border-2 transition-all hover:scale-110 active:scale-90 ${selectedFilters.color === color.name ? "border-emerald-600 scale-110" : "border-transparent"
-                                        }`}
-                                    title={color.name}
-                                >
-                                    <div
-                                        className={`w-full h-full rounded-full ${color.border ? "border border-stone-200" : ""}`}
-                                        style={{ backgroundColor: color.hex }}
-                                    />
-                                    {selectedFilters.color === color.name && (
-                                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-600 rounded-full border-2 border-white" />
-                                    )}
-                                </button>
-                            ))}
-                        </div>
-                    ) : type === "size" ? (
-                        <div className="grid grid-cols-4 gap-2 pt-2">
-                            {items.map((size) => (
-                                <button
-                                    key={size}
-                                    onClick={() => handleFilterChange("size", size)}
-                                    className={`py-2 text-[11px] font-black border-2 rounded-xl transition-all ${selectedFilters.size === size
-                                        ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                                        : "border-stone-100 text-stone-500 hover:border-stone-200 hover:text-stone-900"
-                                        }`}
-                                >
-                                    {size}
-                                </button>
-                            ))}
-                        </div>
-                    ) : (
+                    {items && items.length > 0 ? (
                         items.map((item) => (
                             <FilterRadio
-                                key={item}
-                                label={type === "discount" ? `${item}% or more` : item}
+                                key={item._id}
+                                label={item.name}
                                 name={type}
-                                checked={selectedFilters[type] === item}
-                                onChange={() => handleFilterChange(type, item)}
+                                checked={selectedFilters[type] === item._id}
+                                onChange={() => handleFilterChange(type, item._id)}
                             />
                         ))
+                    ) : (
+                        <p className="text-sm text-stone-500 italic py-2">
+                            {type === 'subcategory' && !selectedFilters.category ? 'Select a category first' : 'No options available'}
+                        </p>
                     )}
                 </div>
             )}
@@ -207,24 +176,6 @@ const FilterSection = ({ isOpen, onToggle, selectedFilters, onFilterChange }) =>
                             items={brands}
                             type="brand"
                             isExpanded={expandedSections.brand}
-                        />
-                        <FilterGroup
-                            title="Size"
-                            items={sizes}
-                            type="size"
-                            isExpanded={expandedSections.size}
-                        />
-                        <FilterGroup
-                            title="Color"
-                            items={colors}
-                            type="color"
-                            isExpanded={expandedSections.color}
-                        />
-                        <FilterGroup
-                            title="Discount"
-                            items={discounts}
-                            type="discount"
-                            isExpanded={expandedSections.discount}
                         />
                     </div>
                 </div>
