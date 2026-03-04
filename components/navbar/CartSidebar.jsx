@@ -10,6 +10,8 @@ const CartSidebar = ({ isOpen, onClose }) => {
 
     if (!isOpen) return null;
 
+    const spacesUrl = process.env.NEXT_PUBLIC_SPACES_URL;
+
     return (
         <div className="fixed inset-0 z-[100] overflow-hidden">
             {/* Backdrop */}
@@ -23,7 +25,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                 <div className="w-screen max-w-md bg-white shadow-2xl animate-fade-in-left">
                     <div className="h-full flex flex-col pt-6 bg-white overflow-hidden">
                         {/* Header */}
-                        <div className="px-6 flex items-center justify-between mb-8 flex-shrink-0">
+                        <div className="px-6 flex items-center justify-between mb-8 shrink-0">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center">
                                     <ShoppingBag className="w-5 h-5 text-emerald-600" />
@@ -31,7 +33,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                                 <div>
                                     <h2 className="text-xl font-black text-stone-900 uppercase tracking-tight">Your Cart</h2>
                                     <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest leading-none">
-                                        {cartCount} {cartCount === 1 ? 'Item' : 'Items'} Ready
+                                        {cartCount} {cartCount === 1 ? "Item" : "Items"} Ready
                                     </p>
                                 </div>
                             </div>
@@ -63,11 +65,11 @@ const CartSidebar = ({ isOpen, onClose }) => {
                             ) : (
                                 <div className="space-y-6">
                                     {cart.map((item, idx) => (
-                                        <div key={`${item.id}-${item.size}-${item.color}-${idx}`} className="group relative flex gap-4 p-4 rounded-3xl border border-stone-100 hover:border-emerald-100 hover:bg-emerald-50/30 transition-all">
-                                            <div className="w-24 h-24 flex-shrink-0 rounded-2xl overflow-hidden bg-stone-100">
+                                        <div key={`${item._id}-${item.size}-${item.color}-${idx}`} className="group relative flex gap-4 p-4 rounded-3xl border border-stone-100 hover:border-emerald-100 hover:bg-emerald-50/30 transition-all">
+                                            <div className="w-24 h-24 shrink-0 rounded-2xl overflow-hidden bg-stone-100">
                                                 <img
-                                                    src={process.env.NEXT_PUBLIC_IMAGE_URL + item.image}
-                                                    alt={item.name}
+                                                    src={spacesUrl + item.image}
+                                                    alt={item.title}
                                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                                 />
                                             </div>
@@ -76,32 +78,38 @@ const CartSidebar = ({ isOpen, onClose }) => {
                                                 <div>
                                                     <div className="flex justify-between items-start mb-1">
                                                         <h3 className="text-sm font-black text-stone-900 uppercase line-clamp-1">
-                                                            {item.name}
+                                                            {item.title}
                                                         </h3>
                                                         <button
-                                                            onClick={() => removeFromCart(item.id, item.size, item.color)}
+                                                            onClick={() => removeFromCart(item._id, item.size, item.color)}
                                                             className="p-1 text-stone-300 hover:text-red-500 transition-colors"
                                                         >
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
                                                     </div>
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <span className="px-2 py-0.5 bg-stone-100 text-[10px] font-black uppercase tracking-widest text-stone-600 rounded-md">{item.size}</span>
-                                                        <span className="px-2 py-0.5 bg-stone-100 text-[10px] font-black uppercase tracking-widest text-stone-600 rounded-md">{item.color}</span>
-                                                    </div>
+                                                    {(item.size || item.color) && (
+                                                        <div className="flex items-center gap-2 mb-2">
+                                                            {item.size && (
+                                                                <span className="px-2 py-0.5 bg-stone-100 text-[10px] font-black uppercase tracking-widest text-stone-600 rounded-md">{item.size}</span>
+                                                            )}
+                                                            {item.color && (
+                                                                <span className="px-2 py-0.5 bg-stone-100 text-[10px] font-black uppercase tracking-widest text-stone-600 rounded-md">{item.color}</span>
+                                                            )}
+                                                        </div>
+                                                    )}
                                                     <div className="flex items-center justify-between">
                                                         <span className="text-lg font-black text-emerald-700">${item.price}</span>
 
                                                         <div className="flex items-center gap-3 bg-white border border-stone-100 rounded-xl px-2 py-1">
                                                             <button
-                                                                onClick={() => updateQuantity(item.id, item.size, item.color, item.quantity - 1)}
+                                                                onClick={() => updateQuantity(item._id, item.size, item.color, item.quantity - 1)}
                                                                 className="text-stone-400 hover:text-stone-900 transition-colors"
                                                             >
                                                                 <Minus className="w-3 h-3" />
                                                             </button>
                                                             <span className="text-xs font-black text-stone-900 w-4 text-center">{item.quantity}</span>
                                                             <button
-                                                                onClick={() => updateQuantity(item.id, item.size, item.color, item.quantity + 1)}
+                                                                onClick={() => updateQuantity(item._id, item.size, item.color, item.quantity + 1)}
                                                                 className="text-stone-400 hover:text-stone-900 transition-colors"
                                                             >
                                                                 <Plus className="w-3 h-3" />
@@ -118,10 +126,10 @@ const CartSidebar = ({ isOpen, onClose }) => {
 
                         {/* Footer */}
                         {cart.length > 0 && (
-                            <div className="px-6 py-6 border-t border-stone-100 space-y-4 bg-white shadow-[0_-10px_40px_rgba(0,0,0,0.02)] flex-shrink-0">
+                            <div className="px-6 py-6 border-t border-stone-100 space-y-4 bg-white shadow-[0_-10px_40px_rgba(0,0,0,0.02)] shrink-0">
                                 <div className="flex items-center justify-between px-2">
                                     <span className="text-xs font-black uppercase tracking-widest text-stone-400">Subtotal</span>
-                                    <span className="text-2xl font-black text-stone-900">${cartTotal}</span>
+                                    <span className="text-2xl font-black text-stone-900">${cartTotal.toFixed(2)}</span>
                                 </div>
                                 <Link
                                     href="/checkout"
