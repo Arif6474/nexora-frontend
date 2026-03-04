@@ -1,43 +1,37 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useRef } from "react";
-import Link from "next/link";
+import React, { useState, useMemo, useEffect } from "react";
 import { useParams } from "next/navigation";
-import {
-    ChevronRight,
-    Star,
-    ShoppingCart,
-    Heart,
-    ShieldCheck,
-    Truck,
-    ArrowLeftRight,
-    Minus,
-    Plus,
-    Share2
-} from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 
-import ProductCard from "@/components/shop/ProductCard";
 import QuickViewModal from "@/components/shop/QuickViewModal";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
 import useFetch from "@/utils/hooks/useFetch";
 import { SINGLE_PRODUCT_BY_SLUG_API } from "@/utils/APIs";
 
-const ProductDetails = () => {
+// Imported Refactored Components
+import ProductBreadcrumbs from "@/components/product/ProductBreadcrumbs";
+import ProductGallery from "@/components/product/ProductGallery";
+import ProductInfo from "@/components/product/ProductInfo";
+import ProductVariants from "@/components/product/ProductVariants";
+import ProductActions from "@/components/product/ProductActions";
+import ProductTabs from "@/components/product/ProductTabs";
+import RelatedProducts from "@/components/product/RelatedProducts";
+
+const ProductDetailsPage = () => {
     const { slug } = useParams();
     const [selectedSize, setSelectedSize] = useState("");
     const [selectedColor, setSelectedColor] = useState("");
     const [quantity, setQuantity] = useState(1);
-    const [activeTab, setActiveTab] = useState("description");
-    const [mainImage, setMainImage] = useState("");
     const [quickViewProduct, setQuickViewProduct] = useState(null);
-    const sliderRef = useRef(null);
-    const [isPaused, setIsPaused] = useState(false);
-    const { toggleWishlist, isInWishlist } = useWishlist();
-    const { addToCart } = useCart();
     const [showError, setShowError] = useState(false);
 
+    const { toggleWishlist, isInWishlist } = useWishlist();
+    const { addToCart } = useCart();
+
     const { data: responseData, isLoading, error } = useFetch(slug ? SINGLE_PRODUCT_BY_SLUG_API + slug : null);
+
     const product = responseData?.product;
     const productColors = responseData?.productColors || [];
     const productSizes = responseData?.productSizes || [];
@@ -46,32 +40,11 @@ const ProductDetails = () => {
 
     const spacesUrl = process.env.NEXT_PUBLIC_SPACES_URL;
 
-    useEffect(() => {
-        if (product) setMainImage(product.image);
-    }, [product]);
-
     const productImages = useMemo(() => {
         if (!product) return [];
         if (apiProductImages.length > 0) return apiProductImages.map(img => img.image);
         return [product.image];
     }, [product, apiProductImages]);
-
-    useEffect(() => {
-        if (!sliderRef.current || isPaused) return;
-
-        const interval = setInterval(() => {
-            if (sliderRef.current) {
-                const maxScroll = sliderRef.current.scrollWidth - sliderRef.current.offsetWidth;
-                if (sliderRef.current.scrollLeft >= maxScroll - 1) {
-                    sliderRef.current.scrollTo({ left: 0, behavior: "smooth" });
-                } else {
-                    sliderRef.current.scrollBy({ left: 350, behavior: "smooth" });
-                }
-            }
-        }, 3000);
-
-        return () => clearInterval(interval);
-    }, [isPaused, relatedProducts]);
 
     if (isLoading) {
         return (
@@ -93,294 +66,87 @@ const ProductDetails = () => {
                     </div>
                     <h1 className="text-4xl font-black text-stone-900 mb-4 uppercase tracking-tight">Product Not Found</h1>
                     <p className="text-stone-500 font-medium mb-8">The piece you're looking for might have moved or is no longer available in our curation.</p>
-                    <Link href="/shop" className="inline-flex items-center justify-center h-14 px-10 bg-stone-900 text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-emerald-600 transition-all shadow-xl shadow-stone-900/10">
+                    <a href="/shop" className="inline-flex items-center justify-center h-14 px-10 bg-stone-900 text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-emerald-600 transition-all shadow-xl shadow-stone-900/10">
                         Explore Collection
-                    </Link>
+                    </a>
                 </div>
             </div>
         );
     }
 
-    const currentSize = selectedSize || "";
-    const currentColor = selectedColor || "";
-
     const handleAddToCart = () => {
-        if (!currentSize || !currentColor) {
+        const hasColors = productColors.length > 0;
+        const hasSizes = productSizes.length > 0;
+
+        if ((hasSizes && !selectedSize) || (hasColors && !selectedColor)) {
             setShowError(true);
             setTimeout(() => setShowError(false), 2000);
             return;
         }
-        addToCart(product, currentSize, currentColor, quantity);
+        addToCart(product, selectedSize, selectedColor, quantity);
     };
 
     return (
         <div className="min-h-screen bg-stone-50">
-
             <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
-                {/* Breadcrumbs */}
-                <nav className="flex items-center gap-2 text-sm font-bold text-stone-400 mb-8 sm:mb-12">
-                    <Link href="/" className="hover:text-emerald-600 transition-colors">Home</Link>
-                    <ChevronRight className="w-4 h-4" />
-                    <Link href="/shop" className="hover:text-emerald-600 transition-colors">Shop</Link>
-                    <ChevronRight className="w-4 h-4" />
-                    <span className="text-stone-400">{product.category?.name}</span>
-                    <ChevronRight className="w-4 h-4" />
-                    <span className="text-stone-900 line-clamp-1">{product.title}</span>
-                </nav>
+                <ProductBreadcrumbs
+                    categoryName={product.category?.name}
+                    title={product.title}
+                />
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-                    {/* Left: Image Gallery */}
-                    <div className="space-y-6">
-                        <div className="aspect-[4/5] bg-white rounded-[40px] overflow-hidden border border-stone-200 shadow-2xl shadow-stone-200/50 group relative">
-                            <img
-                                src={spacesUrl + mainImage}
-                                alt={product.title}
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            />
-                            {product.badge && (
-                                <div className="absolute top-8 left-8 px-4 py-2 bg-amber-50 text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-xl">
-                                    {product.badge}
-                                </div>
-                            )}
-                        </div>
-                        {/* Thumbnails */}
-                        <div className="grid grid-cols-4 gap-4">
-                            {productImages.map((img, i) => (
-                                <div
-                                    key={i}
-                                    onClick={() => setMainImage(img)}
-                                    className={`aspect-square bg-white rounded-2xl border-2 transition-all cursor-pointer overflow-hidden ${mainImage === img ? "border-emerald-600 scale-95" : "border-stone-100 hover:border-stone-200"}`}
-                                >
-                                    <img src={spacesUrl + img} className="w-full h-full object-cover opacity-60 hover:opacity-100 transition-opacity" />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    <ProductGallery
+                        productImages={productImages}
+                        initialMainImage={product.image}
+                        title={product.title}
+                        badge={product.badge}
+                        spacesUrl={spacesUrl}
+                    />
 
-                    {/* Right: Product Info */}
                     <div className="flex flex-col">
-                        <div className="mb-6">
-                            <h1 className="text-4xl sm:text-5xl font-black text-stone-900 tracking-tight leading-tight mb-4 uppercase">
-                                {product.title}
-                            </h1>
-                            <div className="flex items-center gap-6">
-                                <div className="flex items-center gap-2">
-                                    <div className="flex items-center gap-0.5">
-                                        {[...Array(5)].map((_, i) => (
-                                            <Star key={i} className={`w-4 h-4 ${i < Math.floor(product.rating) ? "fill-amber-400 text-amber-400" : "text-stone-200"}`} />
-                                        ))}
-                                    </div>
-                                    <span className="text-sm font-black text-stone-900">{product.rating}</span>
-                                </div>
-                                <span className="text-stone-300">|</span>
-                                <button className="text-sm font-bold text-stone-500 hover:text-emerald-600 transition-colors uppercase tracking-wide">
-                                    {product.reviews} Reviews
-                                </button>
-                            </div>
-                        </div>
+                        <ProductInfo
+                            title={product.title}
+                            rating={product.rating}
+                            reviews={product.reviews}
+                            price={product.price}
+                            originalPrice={product.originalPrice}
+                            description={product.description}
+                        />
 
-                        <div className="flex items-baseline gap-4 mb-8">
-                            <span className="text-4xl font-black text-emerald-700">${product.price}</span>
-                            {product.originalPrice && (
-                                <span className="text-xl font-bold text-stone-400 line-through">${product.originalPrice}</span>
-                            )}
-                        </div>
+                        <ProductVariants
+                            productColors={productColors}
+                            productSizes={productSizes}
+                            currentColor={selectedColor}
+                            onSelectColor={setSelectedColor}
+                            currentSize={selectedSize}
+                            onSelectSize={setSelectedSize}
+                            showError={showError}
+                        />
 
-                        <p className="text-stone-500 font-medium leading-relaxed mb-8 text-lg">
-                            {product.description || "Indulge in the epitome of modern elegance with this meticulously crafted piece. Designed for those who appreciate the finer details and timeless style."}
-                        </p>
-
-                        {/* Color Selector */}
-                        {productColors.length > 0 && (
-                            <div className={`mb-8 transition-all duration-300 ${showError && !currentColor ? "p-4 bg-red-50 rounded-3xl border border-red-100 ring-4 ring-red-500/10" : ""}`}>
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-xs font-black uppercase tracking-widest text-stone-400">Select Color</h3>
-                                    {showError && !currentColor && (
-                                        <span className="text-[10px] font-black text-red-500 uppercase tracking-widest animate-bounce">Required</span>
-                                    )}
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    {productColors.map((pc) => {
-                                        const color = pc.color;
-                                        return (
-                                            <button
-                                                key={color.name}
-                                                onClick={() => setSelectedColor(color.name)}
-                                                title={color.name}
-                                                className={`group relative w-10 h-10 rounded-full border-2 transition-all ${currentColor === color.name ? "border-emerald-600 scale-110" : "border-transparent"}`}
-                                            >
-                                                <div
-                                                    className={`w-full h-full rounded-full border border-stone-100 shadow-sm`}
-                                                    style={{ backgroundColor: color.hexCode || color.colorHex || color.color }}
-                                                />
-                                                {currentColor === color.name && (
-                                                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-600 rounded-full border-2 border-white flex items-center justify-center">
-                                                        <div className="w-1.5 h-1.5 bg-white rounded-full" />
-                                                    </div>
-                                                )}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Size Selector */}
-                        {productSizes.length > 0 && (
-                            <div className={`mb-8 transition-all duration-300 ${showError && !currentSize ? "p-4 bg-red-50 rounded-3xl border border-red-100 ring-4 ring-red-500/10" : ""}`}>
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-xs font-black uppercase tracking-widest text-stone-400">Select Size</h3>
-                                    {showError && !currentSize && (
-                                        <span className="text-[10px] font-black text-red-500 uppercase tracking-widest animate-bounce">Required</span>
-                                    )}
-                                    <button className="text-[10px] font-black uppercase tracking-widest text-emerald-700 hover:underline">Size Guide</button>
-                                </div>
-                                <div className="grid grid-cols-5 gap-3">
-                                    {productSizes.map((ps) => {
-                                        const size = ps.size?.size;
-                                        return (
-                                            <button
-                                                key={size}
-                                                onClick={() => setSelectedSize(size)}
-                                                className={`py-3 rounded-2xl font-black text-sm transition-all border-2 ${currentSize === size
-                                                    ? "border-emerald-600 bg-emerald-50 text-emerald-700 shadow-lg shadow-emerald-700/5 rotate-1"
-                                                    : "border-stone-100 text-stone-400 hover:border-stone-300 hover:text-stone-900"
-                                                    }`}
-                                            >
-                                                {size}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Quantity & Add to Cart */}
-                        <div className="flex flex-col sm:flex-row gap-4 mb-10 pt-4">
-                            <div className="flex items-center justify-between bg-white border-2 border-stone-100 rounded-2xl p-1 min-w-[140px]">
-                                <button
-                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                    className="w-10 h-10 flex items-center justify-center text-stone-400 hover:text-stone-900 transition-colors"
-                                >
-                                    <Minus className="w-4 h-4" />
-                                </button>
-                                <span className="font-black text-lg text-stone-900">{quantity}</span>
-                                <button
-                                    onClick={() => setQuantity(quantity + 1)}
-                                    className="w-10 h-10 flex items-center justify-center text-stone-400 hover:text-stone-900 transition-colors"
-                                >
-                                    <Plus className="w-4 h-4" />
-                                </button>
-                            </div>
-                            <button
-                                onClick={handleAddToCart}
-                                className={`flex-1 py-5 font-black uppercase tracking-[0.2em] text-sm rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-2xl flex items-center justify-center gap-3 ${showError && ((productSizes.length > 0 && !currentSize) || (productColors.length > 0 && !currentColor)) ? "bg-red-500 shadow-red-500/20" : "bg-stone-900 text-white shadow-stone-900/20 hover:bg-emerald-700"}`}
-                            >
-                                <ShoppingCart className="w-5 h-5" />
-                                {showError && ((productSizes.length > 0 && !currentSize) || (productColors.length > 0 && !currentColor)) ? "Select Options" : "Add To Basket"}
-                            </button>
-                            <button
-                                onClick={() => toggleWishlist(product)}
-                                className={`w-16 h-16 flex items-center justify-center border-2 rounded-2xl transition-all group ${isInWishlist(product._id) ? "border-emerald-600 bg-emerald-50 text-emerald-600" : "border-stone-100 text-stone-400 hover:text-emerald-600 hover:border-emerald-600"}`}
-                            >
-                                <Heart className={`w-6 h-6 group-hover:fill-emerald-600 transition-all ${isInWishlist(product._id) ? "fill-emerald-600" : ""}`} />
-                            </button>
-                        </div>
-
-                        {/* Trust Badges */}
-                        <div className="grid grid-cols-3 gap-4 py-8 border-t border-stone-100">
-                            <div className="flex flex-col items-center text-center gap-2">
-                                <Truck className="w-5 h-5 text-emerald-600" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-stone-400">Free Logistics</span>
-                            </div>
-                            <div className="flex flex-col items-center text-center gap-2">
-                                <ShieldCheck className="w-5 h-5 text-emerald-600" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-stone-400">Insured Value</span>
-                            </div>
-                            <div className="flex flex-col items-center text-center gap-2">
-                                <ArrowLeftRight className="w-5 h-5 text-emerald-600" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-stone-400">Elite Exchange</span>
-                            </div>
-                        </div>
+                        <ProductActions
+                            quantity={quantity}
+                            setQuantity={setQuantity}
+                            onAddToCart={handleAddToCart}
+                            onToggleWishlist={() => toggleWishlist(product)}
+                            isInWishlist={isInWishlist(product._id)}
+                            showError={showError}
+                            hasSizes={productSizes.length > 0}
+                            hasColors={productColors.length > 0}
+                            currentSize={selectedSize}
+                            currentColor={selectedColor}
+                        />
                     </div>
                 </div>
 
-                {/* Tabs Section */}
-                <div className="mt-20">
-                    <div className="flex items-center gap-8 border-b border-stone-200 mb-10 overflow-x-auto pb-px">
-                        {["description", "specifications", "shipping"].map((tab) => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`pb-6 text-sm font-black uppercase tracking-[0.2em] transition-all relative ${activeTab === tab ? "text-emerald-700" : "text-stone-400 hover:text-stone-900"}`}
-                            >
-                                {tab}
-                                {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-1 bg-emerald-700 rounded-full" />}
-                            </button>
-                        ))}
-                    </div>
+                <ProductTabs
+                    description={product.description}
+                    features={product.features}
+                />
 
-                    <div className="max-w-4xl">
-                        {activeTab === "description" && (
-                            <div className="space-y-6 animate-fade-in-up">
-                                <p className="text-stone-500 font-medium leading-loose text-lg" dangerouslySetInnerHTML={{ __html: product.description }} />
-                                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {(product.features || []).map((feature, i) => (
-                                        <li key={i} className="flex items-center gap-3 text-stone-600 font-bold">
-                                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-                                            {feature}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
-                        {activeTab === "specifications" && (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 animate-fade-in-up">
-                                {[
-                                    { label: "Material", value: "100% Premium Cotton" },
-                                    { label: "Weight", value: "240 GSM" },
-                                    { label: "Origin", value: "Crafted in Italy" },
-                                    { label: "Care", value: "Dry clean only" }
-                                ].map((spec, i) => (
-                                    <div key={i} className="flex items-center gap-4">
-                                        <span className="text-xs font-black uppercase tracking-widest text-stone-400 w-24">{spec.label}</span>
-                                        <span className="text-stone-900 font-bold">{spec.value}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Related Products Section */}
-                <div className="mt-32">
-                    <div className="flex items-center justify-between mb-12">
-                        <div>
-                            <h2 className="text-3xl font-black text-stone-900 uppercase tracking-tight mb-2">Complete The Look</h2>
-                            <p className="text-stone-400 font-bold uppercase tracking-widest text-xs">Recommended Curations</p>
-                        </div>
-                        <Link href="/shop" className="group flex items-center gap-2 text-stone-900 font-black uppercase tracking-widest text-xs">
-                            Shop All
-                            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                    </div>
-
-                    <div
-                        ref={sliderRef}
-                        onMouseEnter={() => setIsPaused(true)}
-                        onMouseLeave={() => setIsPaused(false)}
-                        className="flex gap-8 overflow-x-auto pb-8 scroll-smooth no-scrollbar"
-                    >
-                        {relatedProducts.map((p) => (
-                            <div key={p._id} className="min-w-[280px] sm:min-w-[320px] lg:min-w-[350px]">
-                                <ProductCard
-                                    product={p}
-                                    onQuickView={setQuickViewProduct}
-                                />
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                <RelatedProducts
+                    relatedProducts={relatedProducts}
+                    setQuickViewProduct={setQuickViewProduct}
+                />
             </div>
 
             <QuickViewModal
@@ -392,4 +158,4 @@ const ProductDetails = () => {
     );
 };
 
-export default ProductDetails;
+export default ProductDetailsPage;
