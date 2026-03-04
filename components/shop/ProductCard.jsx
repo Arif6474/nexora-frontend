@@ -56,7 +56,7 @@ const ProductCard = ({ product, onQuickView }) => {
                     <button
                         onClick={(e) => {
                             e.preventDefault();
-                            toggleWishlist(product._id);
+                            toggleWishlist(product);
                         }}
                         className="w-12 h-12 rounded-full bg-white hover:bg-emerald-600 flex items-center justify-center transition-all hover:scale-110 shadow-lg group/btn"
                     >

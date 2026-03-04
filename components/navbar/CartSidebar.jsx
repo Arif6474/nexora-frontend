@@ -66,7 +66,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                                         <div key={`${item.id}-${item.size}-${item.color}-${idx}`} className="group relative flex gap-4 p-4 rounded-3xl border border-stone-100 hover:border-emerald-100 hover:bg-emerald-50/30 transition-all">
                                             <div className="w-24 h-24 flex-shrink-0 rounded-2xl overflow-hidden bg-stone-100">
                                                 <img
-                                                    src={item.image}
+                                                    src={process.env.NEXT_PUBLIC_IMAGE_URL + item.image}
                                                     alt={item.name}
                                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                                 />

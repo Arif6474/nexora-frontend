@@ -24,17 +24,20 @@ export const WishlistProvider = ({ children }) => {
         localStorage.setItem("nexora-wishlist", JSON.stringify(wishlist));
     }, [wishlist]);
 
-    const toggleWishlist = (productId) => {
+    // Accepts a full product object
+    const toggleWishlist = (product) => {
+        if (!product?._id) return;
         setWishlist((prev) => {
-            if (prev.includes(productId)) {
-                return prev.filter((id) => id !== productId);
+            const exists = prev.some((p) => p._id === product._id);
+            if (exists) {
+                return prev.filter((p) => p._id !== product._id);
             } else {
-                return [...prev, productId];
+                return [...prev, product];
             }
         });
     };
 
-    const isInWishlist = (productId) => wishlist.includes(productId);
+    const isInWishlist = (productId) => wishlist.some((p) => p._id === productId);
 
     return (
         <WishlistContext.Provider value={{ wishlist, toggleWishlist, isInWishlist }}>

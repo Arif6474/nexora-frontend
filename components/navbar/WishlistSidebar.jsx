@@ -1,19 +1,19 @@
 "use client";
 
 import React from "react";
-import { X, Heart, ShoppingCart, Trash2, ArrowRight } from "lucide-react";
+import { X, Heart, ShoppingCart, Trash2 } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
-import { allProducts } from "../../app/data/products";
 import Link from "next/link";
 
 const WishlistSidebar = ({ isOpen, onClose }) => {
     const { wishlist, toggleWishlist } = useWishlist();
 
-    const wishlistProducts = wishlist.map(id =>
-        allProducts.find(p => p.id === id)
-    ).filter(Boolean);
+    // wishlist is now an array of full product objects
+    const wishlistProducts = wishlist;
 
     if (!isOpen) return null;
+
+    const spacesUrl = process.env.NEXT_PUBLIC_SPACES_URL;
 
     return (
         <div className="fixed inset-0 z-[100] overflow-hidden">
@@ -28,7 +28,7 @@ const WishlistSidebar = ({ isOpen, onClose }) => {
                 <div className="w-screen max-w-md bg-white shadow-2xl animate-fade-in-left">
                     <div className="h-full flex flex-col pt-6 bg-white overflow-hidden">
                         {/* Header */}
-                        <div className="px-6 flex items-center justify-between mb-8 flex-shrink-0">
+                        <div className="px-6 flex items-center justify-between mb-8 shrink-0">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center">
                                     <Heart className="w-5 h-5 text-emerald-600 fill-emerald-600" />
@@ -36,7 +36,7 @@ const WishlistSidebar = ({ isOpen, onClose }) => {
                                 <div>
                                     <h2 className="text-xl font-black text-stone-900 uppercase tracking-tight">Wishlist</h2>
                                     <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest leading-none">
-                                        {wishlistProducts.length} {wishlistProducts.length === 1 ? 'Item' : 'Items'} Saved
+                                        {wishlistProducts.length} {wishlistProducts.length === 1 ? "Item" : "Items"} Saved
                                     </p>
                                 </div>
                             </div>
@@ -68,15 +68,15 @@ const WishlistSidebar = ({ isOpen, onClose }) => {
                             ) : (
                                 <div className="space-y-6">
                                     {wishlistProducts.map((product) => (
-                                        <div key={product.id} className="group relative flex gap-4 p-4 rounded-3xl border border-stone-100 hover:border-emerald-100 hover:bg-emerald-50/30 transition-all">
+                                        <div key={product._id} className="group relative flex gap-4 p-4 rounded-3xl border border-stone-100 hover:border-emerald-100 hover:bg-emerald-50/30 transition-all">
                                             <Link
-                                                href={`/product/${product.id}`}
+                                                href={`/product/${product._id}`}
                                                 onClick={onClose}
-                                                className="w-24 h-24 flex-shrink-0 rounded-2xl overflow-hidden bg-stone-100"
+                                                className="w-24 h-24 shrink-0 rounded-2xl overflow-hidden bg-stone-100"
                                             >
                                                 <img
-                                                    src={product.image}
-                                                    alt={product.name}
+                                                    src={spacesUrl + product.image}
+                                                    alt={product.title}
                                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                                 />
                                             </Link>
@@ -85,20 +85,22 @@ const WishlistSidebar = ({ isOpen, onClose }) => {
                                                 <div>
                                                     <div className="flex justify-between items-start mb-1">
                                                         <Link
-                                                            href={`/product/${product.id}`}
+                                                            href={`/product/${product._id}`}
                                                             onClick={onClose}
                                                             className="text-sm font-black text-stone-900 uppercase line-clamp-1 hover:text-emerald-700 transition-colors"
                                                         >
-                                                            {product.name}
+                                                            {product.title}
                                                         </Link>
                                                         <button
-                                                            onClick={() => toggleWishlist(product.id)}
+                                                            onClick={() => toggleWishlist(product)}
                                                             className="p-1 text-stone-300 hover:text-red-500 transition-colors"
                                                         >
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
                                                     </div>
-                                                    <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest">{product.category}</p>
+                                                    <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest">
+                                                        {product.category?.name ?? product.category}
+                                                    </p>
                                                     <div className="mt-2 flex items-baseline gap-2">
                                                         <span className="text-lg font-black text-emerald-700">${product.price}</span>
                                                         {product.originalPrice && (
@@ -106,8 +108,6 @@ const WishlistSidebar = ({ isOpen, onClose }) => {
                                                         )}
                                                     </div>
                                                 </div>
-
-                                              
                                             </div>
                                         </div>
                                     ))}
@@ -117,7 +117,7 @@ const WishlistSidebar = ({ isOpen, onClose }) => {
 
                         {/* Footer */}
                         {wishlistProducts.length > 0 && (
-                            <div className="px-6 py-6 border-t border-stone-100 bg-white shadow-[0_-10px_40px_rgba(0,0,0,0.02)] flex-shrink-0">
+                            <div className="px-6 py-6 border-t border-stone-100 bg-white shadow-[0_-10px_40px_rgba(0,0,0,0.02)] shrink-0">
                                 <Link
                                     href="/shop"
                                     onClick={onClose}

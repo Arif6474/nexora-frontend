@@ -137,7 +137,6 @@ const QuantityControl = ({ quantity, onDecrement, onIncrement }) => (
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 const QuickViewModal = ({ product, isOpen, onClose }) => {
-    console.log(product);
 
     const { toggleWishlist, isInWishlist } = useWishlist();
     const { addToCart } = useCart();
@@ -149,7 +148,6 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
     const [mainImage, setMainImage] = useState("");
 
     const { data, isLoading } = useFetch(SINGLE_PRODUCT_API + product?._id);
-    console.log(data);
 
     // Reset state whenever the viewed product changes
     useEffect(() => {
@@ -164,9 +162,9 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
 
     if (!isOpen || !product) return null;
 
-    // Derive dynamic sizes & colors from product data
-    const sizes = product.sizes || [];
-    const colors = product.colors || [];
+    // Derive sizes & colors from fetched product data
+    const sizes = data?.productSizes || [];
+    const colors = data?.productColors || [];
     const hasSizes = sizes.length > 0;
     const hasColors = colors.length > 0;
 
@@ -290,7 +288,7 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
 
                         <div className="flex gap-3">
                             <button
-                                onClick={() => toggleWishlist(product._id)}
+                                onClick={() => toggleWishlist(product)}
                                 className={`flex-1 h-12 rounded-xl border-2 flex items-center justify-center gap-2 transition-all ${wishlisted
                                     ? "border-emerald-600 bg-emerald-50 text-emerald-600"
                                     : "border-stone-100 text-stone-400 hover:border-stone-200"
