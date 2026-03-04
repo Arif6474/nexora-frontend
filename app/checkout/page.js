@@ -286,15 +286,17 @@ const CheckoutPage = () => {
 
                                 <div className="space-y-6 mb-10 max-h-[400px] overflow-y-auto no-scrollbar">
                                     {cart.map((item, idx) => (
-                                        <div key={`${item.id}-${item.size}-${item.color}-${idx}`} className="flex gap-4">
-                                            <div className="w-24 h-24 bg-stone-100 rounded-2xl overflow-hidden flex-shrink-0">
-                                                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                        <div key={`${item._id}-${item.size}-${item.color}-${idx}`} className="flex gap-4">
+                                            <div className="w-24 h-24 bg-stone-100 rounded-2xl overflow-hidden shrink-0">
+                                                <img src={process.env.NEXT_PUBLIC_SPACES_URL + item.image} alt={item.title} className="w-full h-full object-cover" />
                                             </div>
                                             <div className="flex-1 min-w-0 py-1">
-                                                <h4 className="text-[11px] font-black text-stone-900 uppercase truncate mb-1">{item.name}</h4>
-                                                <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-2">
-                                                    {item.size} / {item.color}
-                                                </p>
+                                                <h4 className="text-[11px] font-black text-stone-900 uppercase truncate mb-1">{item.title}</h4>
+                                                {(item.size || item.color) && (
+                                                    <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-2">
+                                                        {[item.size, item.color].filter(Boolean).join(" / ")}
+                                                    </p>
+                                                )}
                                                 <div className="flex items-center justify-between">
                                                     <span className="text-[10px] font-black text-stone-500">QTY: {item.quantity}</span>
                                                     <span className="text-sm font-black text-emerald-700">${item.price}</span>
@@ -307,7 +309,7 @@ const CheckoutPage = () => {
                                 <div className="space-y-4 pt-8 border-t border-stone-100">
                                     <div className="flex justify-between text-[11px] font-black uppercase tracking-widest text-stone-400 px-1">
                                         <span>Subtotal</span>
-                                        <span className="text-stone-900">${cartTotal}</span>
+                                        <span className="text-stone-900">${cartTotal.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between text-[11px] font-black uppercase tracking-widest text-stone-400 px-1">
                                         <span>Shipping</span>
@@ -319,7 +321,7 @@ const CheckoutPage = () => {
                                     </div>
                                     <div className="flex justify-between items-end pt-4 px-1">
                                         <span className="text-sm font-black uppercase tracking-widest text-stone-900">Total</span>
-                                        <span className="text-3xl font-black text-stone-900 leading-none">${cartTotal}</span>
+                                        <span className="text-3xl font-black text-stone-900 leading-none">${cartTotal.toFixed(2)}</span>
                                     </div>
                                 </div>
                             </div>

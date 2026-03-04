@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+// import { useParams } from "next/navigation";
 import {
     ChevronRight,
     Star,
@@ -18,12 +18,13 @@ import {
 
 import ProductCard from "@/components/shop/ProductCard";
 import QuickViewModal from "@/components/shop/QuickViewModal";
-import { allProducts } from "../../data/products";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
+import useFetch from "@/utils/hooks/useFetch";
+import { SINGLE_PRODUCT_BY_SLUG_API } from "@/utils/APIs";
 
-const ProductDetails = () => {
-    const { id } = useParams();
+const ProductDetails = ({ params }) => {
+    const { slug } = params;
     const [selectedSize, setSelectedSize] = useState("");
     const [selectedColor, setSelectedColor] = useState("");
     const [quantity, setQuantity] = useState(1);
@@ -36,9 +37,14 @@ const ProductDetails = () => {
     const { addToCart } = useCart();
     const [showError, setShowError] = useState(false);
 
-    const product = useMemo(() => {
-        return allProducts.find((p) => p.id.toString() === id);
-    }, [id]);
+    const { data: responseData, isLoading, error } = useFetch(slug ? SINGLE_PRODUCT_BY_SLUG_API + slug : null);
+    const product = responseData?.product;
+    const productColors = responseData?.productColors || [];
+    const productSizes = responseData?.productSizes || [];
+    const apiProductImages = responseData?.productImages || [];
+    const relatedProducts = responseData?.relatedProducts || [];
+
+    const spacesUrl = process.env.NEXT_PUBLIC_SPACES_URL;
 
     useEffect(() => {
         if (product) setMainImage(product.image);
@@ -46,16 +52,9 @@ const ProductDetails = () => {
 
     const productImages = useMemo(() => {
         if (!product) return [];
-        return product.images || [product.image];
-    }, [product]);
-
-    const relatedProducts = useMemo(() => {
-        if (!product) return [];
-        return allProducts
-            .filter((p) => p.category === product.category && p.id !== product.id)
-            .concat(allProducts.filter(p => p.category !== product.category)) // Add more for better sliding
-            .slice(0, 8);
-    }, [product]);
+        if (apiProductImages.length > 0) return apiProductImages.map(img => img.image);
+        return [product.image];
+    }, [product, apiProductImages]);
 
     useEffect(() => {
         if (!sliderRef.current || isPaused) return;
@@ -74,29 +73,36 @@ const ProductDetails = () => {
         return () => clearInterval(interval);
     }, [isPaused, relatedProducts]);
 
-    if (!product) {
+    if (isLoading) {
         return (
             <div className="min-h-screen bg-stone-50 flex items-center justify-center">
-                <div className="text-center">
-                    <h1 className="text-4xl font-black text-stone-900 mb-4">Product Not Found</h1>
-                    <Link href="/shop" className="text-emerald-600 font-bold hover:underline">
-                        Return to Shop
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-emerald-600/20 border-t-emerald-600 rounded-full animate-spin" />
+                    <p className="text-stone-400 font-black uppercase tracking-widest text-[10px]">Loading Nexora Style...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!product || error) {
+        return (
+            <div className="min-h-screen bg-stone-50 flex items-center justify-center px-6">
+                <div className="text-center max-w-md">
+                    <div className="w-20 h-20 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <ShoppingBag className="w-10 h-10 text-stone-200" />
+                    </div>
+                    <h1 className="text-4xl font-black text-stone-900 mb-4 uppercase tracking-tight">Product Not Found</h1>
+                    <p className="text-stone-500 font-medium mb-8">The piece you're looking for might have moved or is no longer available in our curation.</p>
+                    <Link href="/shop" className="inline-flex items-center justify-center h-14 px-10 bg-stone-900 text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-emerald-600 transition-all shadow-xl shadow-stone-900/10">
+                        Explore Collection
                     </Link>
                 </div>
             </div>
         );
     }
 
-    const sizes = ["S", "M", "L", "XL", "XXL"];
-    const colors = [
-        { name: "Black", hex: "#000000" },
-        { name: "Emerald", hex: "#10B981" },
-        { name: "Stone", hex: "#78716C" },
-        { name: "White", hex: "#FFFFFF" }
-    ];
-
-    const currentSize = selectedSize || product.size || "";
-    const currentColor = selectedColor || product.color || "";
+    const currentSize = selectedSize || "";
+    const currentColor = selectedColor || "";
 
     const handleAddToCart = () => {
         if (!currentSize || !currentColor) {
@@ -117,9 +123,9 @@ const ProductDetails = () => {
                     <ChevronRight className="w-4 h-4" />
                     <Link href="/shop" className="hover:text-emerald-600 transition-colors">Shop</Link>
                     <ChevronRight className="w-4 h-4" />
-                    <span className="text-stone-400">{product.category}</span>
+                    <span className="text-stone-400">{product.category?.name}</span>
                     <ChevronRight className="w-4 h-4" />
-                    <span className="text-stone-900 line-clamp-1">{product.name}</span>
+                    <span className="text-stone-900 line-clamp-1">{product.title}</span>
                 </nav>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
@@ -127,12 +133,12 @@ const ProductDetails = () => {
                     <div className="space-y-6">
                         <div className="aspect-[4/5] bg-white rounded-[40px] overflow-hidden border border-stone-200 shadow-2xl shadow-stone-200/50 group relative">
                             <img
-                                src={mainImage}
-                                alt={product.name}
+                                src={spacesUrl + mainImage}
+                                alt={product.title}
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             />
                             {product.badge && (
-                                <div className="absolute top-8 left-8 px-4 py-2 bg-amber-500 text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-xl">
+                                <div className="absolute top-8 left-8 px-4 py-2 bg-amber-50 text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-xl">
                                     {product.badge}
                                 </div>
                             )}
@@ -145,7 +151,7 @@ const ProductDetails = () => {
                                     onClick={() => setMainImage(img)}
                                     className={`aspect-square bg-white rounded-2xl border-2 transition-all cursor-pointer overflow-hidden ${mainImage === img ? "border-emerald-600 scale-95" : "border-stone-100 hover:border-stone-200"}`}
                                 >
-                                    <img src={img} className="w-full h-full object-cover opacity-60 hover:opacity-100 transition-opacity" />
+                                    <img src={spacesUrl + img} className="w-full h-full object-cover opacity-60 hover:opacity-100 transition-opacity" />
                                 </div>
                             ))}
                         </div>
@@ -155,7 +161,7 @@ const ProductDetails = () => {
                     <div className="flex flex-col">
                         <div className="mb-6">
                             <h1 className="text-4xl sm:text-5xl font-black text-stone-900 tracking-tight leading-tight mb-4 uppercase">
-                                {product.name}
+                                {product.title}
                             </h1>
                             <div className="flex items-center gap-6">
                                 <div className="flex items-center gap-2">
@@ -185,58 +191,69 @@ const ProductDetails = () => {
                         </p>
 
                         {/* Color Selector */}
-                        <div className={`mb-8 transition-all duration-300 ${showError && !currentColor ? "p-4 bg-red-50 rounded-3xl border border-red-100 ring-4 ring-red-500/10" : ""}`}>
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-xs font-black uppercase tracking-widest text-stone-400">Select Color</h3>
-                                {showError && !currentColor && (
-                                    <span className="text-[10px] font-black text-red-500 uppercase tracking-widest animate-bounce">Required</span>
-                                )}
+                        {productColors.length > 0 && (
+                            <div className={`mb-8 transition-all duration-300 ${showError && !currentColor ? "p-4 bg-red-50 rounded-3xl border border-red-100 ring-4 ring-red-500/10" : ""}`}>
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-xs font-black uppercase tracking-widest text-stone-400">Select Color</h3>
+                                    {showError && !currentColor && (
+                                        <span className="text-[10px] font-black text-red-500 uppercase tracking-widest animate-bounce">Required</span>
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    {productColors.map((pc) => {
+                                        const color = pc.color;
+                                        return (
+                                            <button
+                                                key={color.name}
+                                                onClick={() => setSelectedColor(color.name)}
+                                                title={color.name}
+                                                className={`group relative w-10 h-10 rounded-full border-2 transition-all ${currentColor === color.name ? "border-emerald-600 scale-110" : "border-transparent"}`}
+                                            >
+                                                <div
+                                                    className={`w-full h-full rounded-full border border-stone-100 shadow-sm`}
+                                                    style={{ backgroundColor: color.hexCode || color.colorHex || color.color }}
+                                                />
+                                                {currentColor === color.name && (
+                                                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-600 rounded-full border-2 border-white flex items-center justify-center">
+                                                        <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                                                    </div>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
-                            <div className="flex items-center gap-3">
-                                {colors.map((color) => (
-                                    <button
-                                        key={color.name}
-                                        onClick={() => setSelectedColor(color.name)}
-                                        className={`group relative w-10 h-10 rounded-full border-2 transition-all ${currentColor === color.name ? "border-emerald-600 scale-110" : "border-transparent"}`}
-                                    >
-                                        <div
-                                            className={`w-full h-full rounded-full border border-stone-100 shadow-sm`}
-                                            style={{ backgroundColor: color.hex }}
-                                        />
-                                        {currentColor === color.name && (
-                                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-600 rounded-full border-2 border-white flex items-center justify-center">
-                                                <div className="w-1.5 h-1.5 bg-white rounded-full" />
-                                            </div>
-                                        )}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+                        )}
 
                         {/* Size Selector */}
-                        <div className={`mb-8 transition-all duration-300 ${showError && !currentSize ? "p-4 bg-red-50 rounded-3xl border border-red-100 ring-4 ring-red-500/10" : ""}`}>
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-xs font-black uppercase tracking-widest text-stone-400">Select Size</h3>
-                                {showError && !currentSize && (
-                                    <span className="text-[10px] font-black text-red-500 uppercase tracking-widest animate-bounce">Required</span>
-                                )}
-                                <button className="text-[10px] font-black uppercase tracking-widest text-emerald-700 hover:underline">Size Guide</button>
+                        {productSizes.length > 0 && (
+                            <div className={`mb-8 transition-all duration-300 ${showError && !currentSize ? "p-4 bg-red-50 rounded-3xl border border-red-100 ring-4 ring-red-500/10" : ""}`}>
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-xs font-black uppercase tracking-widest text-stone-400">Select Size</h3>
+                                    {showError && !currentSize && (
+                                        <span className="text-[10px] font-black text-red-500 uppercase tracking-widest animate-bounce">Required</span>
+                                    )}
+                                    <button className="text-[10px] font-black uppercase tracking-widest text-emerald-700 hover:underline">Size Guide</button>
+                                </div>
+                                <div className="grid grid-cols-5 gap-3">
+                                    {productSizes.map((ps) => {
+                                        const size = ps.size?.size;
+                                        return (
+                                            <button
+                                                key={size}
+                                                onClick={() => setSelectedSize(size)}
+                                                className={`py-3 rounded-2xl font-black text-sm transition-all border-2 ${currentSize === size
+                                                    ? "border-emerald-600 bg-emerald-50 text-emerald-700 shadow-lg shadow-emerald-700/5 rotate-1"
+                                                    : "border-stone-100 text-stone-400 hover:border-stone-300 hover:text-stone-900"
+                                                    }`}
+                                            >
+                                                {size}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
-                            <div className="grid grid-cols-5 gap-3">
-                                {sizes.map((size) => (
-                                    <button
-                                        key={size}
-                                        onClick={() => setSelectedSize(size)}
-                                        className={`py-3 rounded-2xl font-black text-sm transition-all border-2 ${currentSize === size
-                                            ? "border-emerald-600 bg-emerald-50 text-emerald-700 shadow-lg shadow-emerald-700/5 rotate-1"
-                                            : "border-stone-100 text-stone-400 hover:border-stone-300 hover:text-stone-900"
-                                            }`}
-                                    >
-                                        {size}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+                        )}
 
                         {/* Quantity & Add to Cart */}
                         <div className="flex flex-col sm:flex-row gap-4 mb-10 pt-4">
@@ -257,16 +274,16 @@ const ProductDetails = () => {
                             </div>
                             <button
                                 onClick={handleAddToCart}
-                                className={`flex-1 py-5 font-black uppercase tracking-[0.2em] text-sm rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-2xl flex items-center justify-center gap-3 ${showError && (!currentSize || !currentColor) ? "bg-red-500 shadow-red-500/20" : "bg-stone-900 text-white shadow-stone-900/20 hover:bg-emerald-700"}`}
+                                className={`flex-1 py-5 font-black uppercase tracking-[0.2em] text-sm rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-2xl flex items-center justify-center gap-3 ${showError && ((productSizes.length > 0 && !currentSize) || (productColors.length > 0 && !currentColor)) ? "bg-red-500 shadow-red-500/20" : "bg-stone-900 text-white shadow-stone-900/20 hover:bg-emerald-700"}`}
                             >
                                 <ShoppingCart className="w-5 h-5" />
-                                {showError && (!currentSize || !currentColor) ? "Select Options" : "Add To Basket"}
+                                {showError && ((productSizes.length > 0 && !currentSize) || (productColors.length > 0 && !currentColor)) ? "Select Options" : "Add To Basket"}
                             </button>
                             <button
-                                onClick={() => toggleWishlist(product.id)}
-                                className={`w-16 h-16 flex items-center justify-center border-2 rounded-2xl transition-all group ${isInWishlist(product.id) ? "border-emerald-600 bg-emerald-50 text-emerald-600" : "border-stone-100 text-stone-400 hover:text-emerald-600 hover:border-emerald-600"}`}
+                                onClick={() => toggleWishlist(product)}
+                                className={`w-16 h-16 flex items-center justify-center border-2 rounded-2xl transition-all group ${isInWishlist(product._id) ? "border-emerald-600 bg-emerald-50 text-emerald-600" : "border-stone-100 text-stone-400 hover:text-emerald-600 hover:border-emerald-600"}`}
                             >
-                                <Heart className={`w-6 h-6 group-hover:fill-emerald-600 transition-all ${isInWishlist(product.id) ? "fill-emerald-600" : ""}`} />
+                                <Heart className={`w-6 h-6 group-hover:fill-emerald-600 transition-all ${isInWishlist(product._id) ? "fill-emerald-600" : ""}`} />
                             </button>
                         </div>
 
@@ -306,9 +323,7 @@ const ProductDetails = () => {
                     <div className="max-w-4xl">
                         {activeTab === "description" && (
                             <div className="space-y-6 animate-fade-in-up">
-                                <p className="text-stone-500 font-medium leading-loose text-lg">
-                                    {product.description} Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                                </p>
+                                <p className="text-stone-500 font-medium leading-loose text-lg" dangerouslySetInnerHTML={{ __html: product.description }} />
                                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {(product.features || []).map((feature, i) => (
                                         <li key={i} className="flex items-center gap-3 text-stone-600 font-bold">
@@ -357,7 +372,7 @@ const ProductDetails = () => {
                         className="flex gap-8 overflow-x-auto pb-8 scroll-smooth no-scrollbar"
                     >
                         {relatedProducts.map((p) => (
-                            <div key={p.id} className="min-w-[280px] sm:min-w-[320px] lg:min-w-[350px]">
+                            <div key={p._id} className="min-w-[280px] sm:min-w-[320px] lg:min-w-[350px]">
                                 <ProductCard
                                     product={p}
                                     onQuickView={setQuickViewProduct}

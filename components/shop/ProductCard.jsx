@@ -16,6 +16,7 @@ const ProductCard = ({ product, onQuickView }) => {
         rating = 4.5,
         reviews = 0,
         badge = null,
+        slug
     } = product;
 
     const discountPercent = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : discount;
@@ -23,7 +24,7 @@ const ProductCard = ({ product, onQuickView }) => {
     return (
         <div className="group relative bg-white rounded-2xl overflow-hidden border border-stone-200 hover:border-emerald-500/30 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-900/10">
             {/* Image Container */}
-            <Link href={`/product/${_id}`} className="relative block aspect-[3/4] overflow-hidden bg-stone-100">
+            <Link href={`/product/${slug}`} className="relative block aspect-[3/4] overflow-hidden bg-stone-100">
                 <img
                     src={process.env.NEXT_PUBLIC_SPACES_URL + image || "/api/placeholder/400/533"}
                     alt={title}
