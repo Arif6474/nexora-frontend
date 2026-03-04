@@ -43,7 +43,7 @@ const RelatedProducts = ({ relatedProducts, setQuickViewProduct }) => {
                 ref={sliderRef}
                 onMouseEnter={() => setIsPaused(true)}
                 onMouseLeave={() => setIsPaused(false)}
-                className="grid grid-cols-5 gap-8 overflow-x-auto pb-8 scroll-smooth no-scrollbar"
+                className="grid grid-cols-2 md:grid-cols-5 gap-8 overflow-x-auto pb-8 scroll-smooth no-scrollbar"
             >
                 {relatedProducts.map((p) => (
                     <div key={p._id}>

@@ -9,7 +9,7 @@ const ProductGallery = ({ productImages, initialMainImage, title, badge, spacesU
 
     return (
         <div className="space-y-6">
-            <div className="aspect-4/5 bg-white rounded-[40px] overflow-hidden border border-stone-200 shadow-2xl shadow-stone-200/50 group relative">
+            <div className="aspect-1/1 bg-white rounded-[40px] overflow-hidden border border-stone-200 shadow-2xl shadow-stone-200/50 group relative">
                 <img
                     src={spacesUrl + mainImage}
                     alt={title}

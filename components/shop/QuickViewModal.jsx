@@ -27,7 +27,7 @@ const ImageGallery = ({ productImages, mainImage, onSelectImage }) => {
     return (
         <div className="w-full md:w-1/2 flex flex-col bg-stone-100">
             {/* Main Image */}
-            <div className="relative aspect-[1/1] bg-stone-100 overflow-hidden">
+            <div className="relative aspect-[1/1] bg-stone-100 ">
                 <img
                     src={spacesUrl + mainImage}
                     alt="Product image"
