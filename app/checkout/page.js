@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import {
     ChevronLeft,
     CreditCard,
@@ -10,15 +11,20 @@ import {
     ArrowRight,
     ShoppingBag,
     CheckCircle2,
-    Lock
+    Lock,
+    Loader2
 } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/navbar/Navbar";
+import { CREATE_ORDER_API } from "@/utils/APIs";
+import { toast } from "react-hot-toast";
 
 const CheckoutPage = () => {
     const { cart, cartTotal, cartCount, clearCart } = useCart();
+    const { user } = useAuth();
     const [isOrdered, setIsOrdered] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState("cod"); // "online" or "cod"
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Form States
     const [formData, setFormData] = useState({
@@ -33,16 +39,80 @@ const CheckoutPage = () => {
         cvv: ""
     });
 
+    // Auto-fill form if user is logged in
+    useEffect(() => {
+        if (user) {
+            setFormData(prev => ({
+                ...prev,
+                email: user.email || "",
+                name: user.name || "",
+                phone: user.phone || ""
+            }));
+        }
+    }, [user]);
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsOrdered(true);
-        // In a real app, clearCart would happen after success
-        // clearCart(); 
+
+        if (!user) {
+            toast.error("Please login to place an order");
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            const orderData = {
+                totalAmount: cartTotal,
+                paymentMethod: paymentMethod === "cod" ? "cod" : "card",
+                shippingDetails: {
+                    name: formData.name,
+                    email: formData.email,
+                    address: formData.address,
+                    city: formData.city,
+                    zipCode: formData.zipCode,
+                    phone: formData.phone,
+                    shippingMethod: "Standard" // Default to Standard
+                },
+                products: cart.map(item => ({
+                    product: item._id,
+                    quantity: item.quantity,
+                    unitPrice: item.price,
+                    totalPrice: item.price * item.quantity,
+                    color: item.color,
+                    size: item.size
+                }))
+            };
+
+            const response = await fetch(CREATE_ORDER_API, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${user.token}`
+                },
+                body: JSON.stringify(orderData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                setIsOrdered(true);
+                clearCart();
+                toast.success("Order placed successfully!");
+            } else {
+                toast.error(result.message || "Failed to place order");
+            }
+        } catch (error) {
+            console.error("Order error:", error);
+            toast.error("An error occurred. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (isOrdered) {
@@ -166,6 +236,18 @@ const CheckoutPage = () => {
                                             placeholder="1200"
                                         />
                                     </div>
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-2">Phone Number</label>
+                                        <input
+                                            required
+                                            type="tel"
+                                            name="phone"
+                                            value={formData.phone}
+                                            onChange={handleInputChange}
+                                            className="w-full px-6 py-4 bg-white border border-stone-100 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-600 outline-none transition-all font-medium text-stone-900"
+                                            placeholder="+880123456789"
+                                        />
+                                    </div>
                                 </div>
                             </section>
 
@@ -207,7 +289,7 @@ const CheckoutPage = () => {
                                             <label className="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-2 group-focus-within:text-emerald-400 transition-colors">Card Number</label>
                                             <div className="relative">
                                                 <input
-                                                    required
+                                                    required={paymentMethod === "online"}
                                                     type="text"
                                                     name="cardNumber"
                                                     value={formData.cardNumber}
@@ -226,7 +308,7 @@ const CheckoutPage = () => {
                                             <div className="relative group">
                                                 <label className="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-2 group-focus-within:text-emerald-400 transition-colors">Expiry Date</label>
                                                 <input
-                                                    required
+                                                    required={paymentMethod === "online"}
                                                     type="text"
                                                     name="expiry"
                                                     value={formData.expiry}
@@ -239,7 +321,7 @@ const CheckoutPage = () => {
                                                 <label className="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-2 group-focus-within:text-emerald-400 transition-colors">CVC</label>
                                                 <div className="relative">
                                                     <input
-                                                        required
+                                                        required={paymentMethod === "online"}
                                                         type="text"
                                                         name="cvv"
                                                         value={formData.cvv}
@@ -267,10 +349,20 @@ const CheckoutPage = () => {
 
                             <button
                                 type="submit"
-                                className="w-full py-6 bg-stone-900 text-white font-black uppercase tracking-[0.2em] text-sm rounded-[24px] hover:bg-emerald-600 transition-all shadow-2xl shadow-stone-900/20 flex items-center justify-center gap-4 group"
+                                disabled={isSubmitting}
+                                className="w-full py-6 bg-stone-900 text-white font-black uppercase tracking-[0.2em] text-sm rounded-[24px] hover:bg-emerald-600 transition-all shadow-2xl shadow-stone-900/20 flex items-center justify-center gap-4 group disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                                Complete Purchase
-                                <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        Processing...
+                                    </>
+                                ) : (
+                                    <>
+                                        Complete Purchase
+                                        <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                                    </>
+                                )}
                             </button>
                         </form>
                     </div>

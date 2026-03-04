@@ -12,6 +12,7 @@ export const LOGIN_WITH_GOOGLE_API = AUTH_API + 'loginWithGoogle/'
 
 // Protected APIs
 export const UPDATE_PROFILE_API = PROTECTED_API_BASE_URL + 'updateProfile/'
+export const CREATE_ORDER_API = PROTECTED_API_BASE_URL + 'createOrder'
 
 // Public APIs
 export const HOME_API = API_BASE_URL + 'getHomePageData'
