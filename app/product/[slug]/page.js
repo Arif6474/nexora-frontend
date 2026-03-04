@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
-// import { useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import {
     ChevronRight,
     Star,
@@ -23,8 +23,8 @@ import { useCart } from "@/context/CartContext";
 import useFetch from "@/utils/hooks/useFetch";
 import { SINGLE_PRODUCT_BY_SLUG_API } from "@/utils/APIs";
 
-const ProductDetails = ({ params }) => {
-    const { slug } = params;
+const ProductDetails = () => {
+    const { slug } = useParams();
     const [selectedSize, setSelectedSize] = useState("");
     const [selectedColor, setSelectedColor] = useState("");
     const [quantity, setQuantity] = useState(1);
