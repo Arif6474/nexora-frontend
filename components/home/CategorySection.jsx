@@ -26,18 +26,13 @@ const CategorySection = () => {
                 {/* Section Header */}
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10 sm:mb-14">
                     <div className="space-y-3">
-                        <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                            <Sparkles className="w-3.5 h-3.5 text-emerald-600 fill-emerald-600/30" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-700">
-                                Curated Departments
-                            </span>
-                        </div>
+                       
                         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-stone-900 tracking-tight leading-tight">
                             Shop by <span className="font-serif italic font-normal text-emerald-800">Category</span>
                         </h2>
-                        <p className="text-sm sm:text-base text-stone-600 max-w-xl font-medium">
+                        {/* <p className="text-sm sm:text-base text-stone-600 max-w-xl font-medium">
                             Explore tailored silhouettes, luxurious knitwear, and handcrafted essentials across our signature collections.
-                        </p>
+                        </p> */}
                     </div>
 
                     {/* Navigation Controls */}

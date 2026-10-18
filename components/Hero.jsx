@@ -1,168 +1,296 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { ArrowRight, Play, Sparkles, MoveDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, ArrowRight, X } from "lucide-react";
+
+const HERO_SLIDES = [
+    {
+        id: 1,
+        tag: "NEW COLLECTION",
+        titleLine1: "Modern",
+        titleLine2: "Essentials",
+        titleLine3: "for Every You",
+        subtitle: "Timeless pieces, modern silhouettes, made to elevate your everyday.",
+        primaryCta: { label: "Shop Collection", href: "/shop" },
+        secondaryCta: { label: "Watch Film" },
+        image: "/images/hero/hero-banner.jpg",
+        imageAlt: "Lumière Modern Essentials Collection - Model in camel blazer with sunglasses",
+    },
+    {
+        id: 2,
+        tag: "THE EMERALD CAPSULE",
+        titleLine1: "Architectural",
+        titleLine2: "Elegance",
+        titleLine3: "in Silk Satin",
+        subtitle: "Pure emerald silk tailoring and architectural fluid silhouettes crafted for refined evenings.",
+        primaryCta: { label: "Explore The Capsule", href: "/shop?search=Silk" },
+        secondaryCta: { label: "Watch Film" },
+        image: "/hero_luxury_fashion_bg.png",
+        imageAlt: "Lumière Emerald Capsule - Luxury model in rich emerald silk suit",
+    },
+    {
+        id: 3,
+        tag: "AUTUMN EDIT 2026",
+        titleLine1: "Sculpted",
+        titleLine2: "Silhouettes",
+        titleLine3: "in Pure Wool",
+        subtitle: "Masterfully tailored trench coats and soft cashmere layers designed for effortless warmth.",
+        primaryCta: { label: "Explore Outerwear", href: "/shop?search=Coat" },
+        secondaryCta: { label: "Watch Film" },
+        image: "/images/hero/dept-women.jpg",
+        imageAlt: "Lumière Autumn Edit - Tailored trench coat and neutral essentials",
+    },
+];
+
+const DEPARTMENT_CARDS = [
+    {
+        title: "Women",
+        href: "/shop?search=Women",
+        image: "/images/hero/dept-women.jpg",
+        alt: "Women's Collection - Tailored coats and dresses",
+    },
+    {
+        title: "Men",
+        href: "/shop?search=Men",
+        image: "/images/hero/dept-men.jpg",
+        alt: "Men's Collection - Tailored blazers and knitwear",
+    },
+    {
+        title: "Bags",
+        href: "/shop?search=Bag",
+        image: "/images/hero/dept-bags.jpg",
+        alt: "Luxury Handbags - Italian leather shoulder bags",
+    },
+    {
+        title: "Accessories",
+        href: "/shop?search=Accessory",
+        image: "/images/hero/dept-accessories.jpg",
+        alt: "Designer Accessories - Sunglasses and jewelry",
+    },
+];
 
 const Hero = () => {
-    const [isLoaded, setIsLoaded] = useState(false);
-    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-    const containerRef = useRef(null);
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const [isHovered, setIsHovered] = useState(false);
+    const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
+    // Auto-advance slides every 7 seconds when not hovered
     useEffect(() => {
-        setIsLoaded(true);
-        const handleMouseMove = (e) => {
-            if (!containerRef.current) return;
-            const rect = containerRef.current.getBoundingClientRect();
-            setMousePos({
-                x: ((e.clientX - rect.left) / rect.width - 0.5) * 20,
-                y: ((e.clientY - rect.top) / rect.height - 0.5) * 20
-            });
-        };
-        window.addEventListener("mousemove", handleMouseMove);
-        return () => window.removeEventListener("mousemove", handleMouseMove);
-    }, []);
+        if (isHovered || isVideoModalOpen) return;
+        const timer = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+        }, 7000);
+        return () => clearInterval(timer);
+    }, [isHovered, isVideoModalOpen]);
+
+    const nextSlide = () => {
+        setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    };
+
+    const prevSlide = () => {
+        setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+    };
+
+    const activeSlideData = HERO_SLIDES[currentSlide];
 
     return (
-        <section
-            ref={containerRef}
-            className="relative w-full min-h-screen flex items-center overflow-hidden bg-stone-900"
-        >
-            {/* Immersive Background Layer */}
-            <div className="absolute inset-0 z-0">
-                <img
-                    src="/hero_luxury_fashion_bg.png"
-                    alt="Luxury Fashion Hero"
-                    className={`w-full h-full object-cover object-center transition-transform duration-[3000ms] ease-out ${isLoaded ? 'scale-110' : 'scale-125'}`}
-                    style={{
-                        transform: `scale(${isLoaded ? 1.1 : 1.25}) translate(${mousePos.x * -0.5}px, ${mousePos.y * -0.5}px)`
-                    }}
-                />
-                {/* Dynamic Gradient Depth */}
-                <div className="absolute inset-0 bg-linear-to-r from-stone-950 via-stone-900/60 to-transparent z-10" />
-                <div className="absolute inset-0 bg-linear-to-t from-stone-950 via-transparent to-stone-950/30 z-10" />
+        <section className="w-full bg-[#fafaf9] pt-0 pb-10 sm:pb-16">
+            {/* ==================== FULL-WIDTH MAIN HERO BANNER ==================== */}
+            <div
+                className="relative w-full overflow-hidden min-h-[560px] sm:min-h-[620px] md:min-h-[680px] lg:min-h-[740px] flex items-center select-none"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+            >
+                {/* Background Slide Images (Edge to Edge Full Width) */}
+                {HERO_SLIDES.map((slide, index) => (
+                    <div
+                        key={slide.id}
+                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                            index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                        }`}
+                    >
+                        <img
+                            src={slide.image}
+                            alt={slide.imageAlt}
+                            className={`w-full h-full object-cover object-[75%_center] sm:object-[70%_center] md:object-center transition-transform duration-[8000ms] ease-out ${
+                                index === currentSlide ? "scale-105" : "scale-100"
+                            }`}
+                        />
+                    </div>
+                ))}
 
-                {/* Kinetic Ghost Typography */}
-                <div
-                    className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-center pointer-events-none opacity-[0.03] select-none z-20"
-                    style={{
-                        transform: `translate(${mousePos.x}px, ${mousePos.y}px) translateY(-50%) rotate(-5deg)`
-                    }}
-                >
-                    <span className="text-[30vw] font-black uppercase tracking-tighter leading-none whitespace-nowrap">
-                        NEXORA • GENESIS
-                    </span>
-                </div>
-            </div>
+                {/* Editorial Gradient Overlay for Text Readability */}
+                <div className="absolute inset-0 z-20 pointer-events-none bg-gradient-to-r from-stone-950/85 via-stone-950/50 to-transparent sm:from-stone-950/80 sm:via-stone-950/40 sm:to-transparent lg:w-[65%]" />
+                <div className="absolute inset-0 z-20 pointer-events-none bg-gradient-to-t from-stone-950/60 via-transparent to-stone-950/20 sm:hidden" />
 
-            {/* Content Core */}
-            <div className="relative z-30 max-w-7xl mx-auto px-6 sm:px-8 w-full pt-20">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-0 items-center">
-
-                    {/* Primary Content (Left) */}
-                    <div className="lg:col-span-8 flex flex-col justify-center">
-                        {/* Status Badge */}
-                        <div className={`inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-10 self-start transition-all duration-1000 transform ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-                            <div className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                            </div>
-                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white">Season 01 • The Nexus Collection</span>
+                {/* Inner Content Area (Constrained to max-w-7xl container) */}
+                <div className="relative z-30 w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 py-16 sm:py-24">
+                    <div className="max-w-2xl flex flex-col justify-center">
+                        {/* Eyebrow Tag with Emerald Accent */}
+                        <div className="mb-3 sm:mb-4">
+                            <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.25em] backdrop-blur-xs">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                {activeSlideData.tag}
+                            </span>
                         </div>
 
-                        {/* Headline Matrix */}
-                        <h1 className="flex flex-col mb-10">
-                            <span className={`text-2xl sm:text-3xl font-serif italic text-emerald-400 mb-4 transition-all duration-1000 delay-100 transform ${isLoaded ? 'translate-x-0 opacity-100' : '-translate-x-12 opacity-0'}`}>
-                                Redefine your
-                            </span>
-                            <span className={`text-6xl sm:text-8xl lg:text-9xl font-black text-white leading-[0.8] tracking-tighter transition-all duration-1000 delay-200 transform ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
-                                ARCHITECTURAL <br />
-                                <span className="text-transparent bg-clip-text bg-linear-to-r from-white via-emerald-100 to-stone-400">ELEGANCE</span>
-                            </span>
+                        {/* Large Editorial Serif Headline */}
+                        <h1 className="font-serif text-[42px] sm:text-5xl md:text-6xl lg:text-[72px] font-normal text-white leading-[1.06] tracking-tight mb-4 sm:mb-5 drop-shadow-md">
+                            {activeSlideData.titleLine1}
+                            <br />
+                            {activeSlideData.titleLine2}
+                            <br />
+                            {activeSlideData.titleLine3}
                         </h1>
 
-                        {/* Description Reveal */}
-                        <p className={`max-w-xl text-lg sm:text-xl text-stone-400 font-medium leading-relaxed mb-14 transition-all duration-1000 delay-300 transform ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-                            Where algorithmic precision meets the soul of craftsmanship. <br />
-                            Nexora is a dialogue between form and modern function.
+                        {/* Subtitle / Description */}
+                        <p className="text-sm sm:text-base md:text-lg text-white/85 font-light leading-relaxed max-w-md mb-8 sm:mb-9 drop-shadow-xs">
+                            {activeSlideData.subtitle}
                         </p>
 
-                        {/* Action Suite */}
-                        <div className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-6 transition-all duration-1000 delay-400 transform ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+                        {/* Dual Action Buttons */}
+                        <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                            {/* Primary Button (Emerald Theme) */}
                             <Link
-                                href="/shop"
-                                className="group relative px-10 py-6 bg-emerald-600 text-white font-black uppercase tracking-widest text-sm rounded-2xl overflow-hidden transition-all hover:bg-emerald-700 hover:scale-[1.02] active:scale-95 shadow-2xl shadow-emerald-900/40 text-center"
+                                href={activeSlideData.primaryCta.href}
+                                className="inline-flex items-center justify-center px-6 sm:px-8 py-3.5 sm:py-4 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs sm:text-sm font-medium tracking-wide transition-all duration-200 shadow-md shadow-emerald-950/30 hover:shadow-lg hover:shadow-emerald-900/40 active:scale-[0.98]"
                             >
-                                <span className="relative z-10 flex items-center justify-center gap-3">
-                                    Access Collection
-                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                </span>
-                                <div className="absolute inset-0 bg-linear-to-r from-emerald-500 to-emerald-800 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                {activeSlideData.primaryCta.label}
                             </Link>
 
-                            <button className="group relative px-8 py-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl text-white font-black uppercase tracking-widest text-xs transition-all hover:bg-white/10 hover:border-white/20 active:scale-95 overflow-hidden">
-                                <span className="relative z-10 flex items-center justify-center gap-4">
-                                    <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-emerald-600/20 group-hover:scale-110 transition-all">
-                                        <Play className="w-4 h-4 fill-white" />
-                                    </div>
-                                    The Manifesto
-                                </span>
-                                <div className="absolute bottom-0 left-0 h-1 bg-emerald-500/50 w-0 group-hover:w-full transition-all duration-500" />
+                            {/* Secondary Button (Watch Film) */}
+                            <button
+                                type="button"
+                                onClick={() => setIsVideoModalOpen(true)}
+                                className="group inline-flex items-center justify-center gap-2.5 px-5 sm:px-7 py-3.5 sm:py-4 rounded-lg border border-white/40 hover:border-emerald-400/60 bg-white/10 hover:bg-emerald-950/30 backdrop-blur-xs text-white text-xs sm:text-sm font-medium tracking-wide transition-all duration-200 active:scale-[0.98]"
+                            >
+                                <div className="w-5 h-5 rounded-full bg-white/20 group-hover:bg-emerald-500/30 flex items-center justify-center group-hover:scale-110 transition-all">
+                                    <Play className="w-2.5 h-2.5 fill-white text-white ml-0.5 group-hover:fill-emerald-300" />
+                                </div>
+                                <span>{activeSlideData.secondaryCta.label}</span>
                             </button>
                         </div>
                     </div>
+                </div>
 
-                    {/* Secondary Context (Right - Visual Stats) */}
-                    <div className="lg:col-span-4 hidden lg:flex flex-col items-end gap-16">
-                        <div className={`text-right group transition-all duration-1000 delay-500 transform ${isLoaded ? 'translate-x-0 opacity-100' : 'translate-x-12 opacity-0'}`}>
-                            <p className="text-5xl font-black text-white mb-2 group-hover:text-emerald-400 transition-colors tracking-tighter">25K+</p>
-                            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-stone-500 leading-none">Global Curations</p>
-                        </div>
-                        <div className={`text-right group transition-all duration-1000 delay-600 transform ${isLoaded ? 'translate-x-0 opacity-100' : 'translate-x-12 opacity-0'}`}>
-                            <p className="text-5xl font-black text-white mb-2 group-hover:text-emerald-400 transition-colors tracking-tighter">4.9</p>
-                            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-stone-500 leading-none">Trust Factor</p>
-                        </div>
-                        <div className={`text-right group transition-all duration-1000 delay-700 transform ${isLoaded ? 'translate-x-0 opacity-100' : 'translate-x-12 opacity-0'}`}>
-                            <div className="inline-flex items-center gap-2 mb-2">
-                                <Sparkles className="w-6 h-6 text-emerald-500 animate-pulse" />
-                                <p className="text-5xl font-black text-white tracking-tighter">FAST</p>
+                {/* Slide Navigation Controls (Bottom Right) */}
+                <div className="absolute bottom-5 right-5 sm:bottom-8 sm:right-8 lg:right-12 z-30 flex items-center gap-2">
+                    {/* Arrow Previous */}
+                    <button
+                        onClick={prevSlide}
+                        aria-label="Previous Slide"
+                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/30 hover:border-emerald-400 bg-black/25 hover:bg-black/50 hover:text-emerald-300 backdrop-blur-xs text-white flex items-center justify-center transition-all active:scale-90"
+                    >
+                        <ChevronLeft className="w-4 h-4" />
+                    </button>
+
+                    {/* Arrow Next */}
+                    <button
+                        onClick={nextSlide}
+                        aria-label="Next Slide"
+                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/30 hover:border-emerald-400 bg-black/25 hover:bg-black/50 hover:text-emerald-300 backdrop-blur-xs text-white flex items-center justify-center transition-all active:scale-90"
+                    >
+                        <ChevronRight className="w-4 h-4" />
+                    </button>
+
+                    {/* Pagination Dots with Emerald Active Indicator */}
+                    <div className="flex items-center gap-1.5 ml-2 bg-black/25 backdrop-blur-xs px-3 py-1.5 rounded-full border border-white/20">
+                        {HERO_SLIDES.map((_, i) => (
+                            <button
+                                key={i}
+                                onClick={() => setCurrentSlide(i)}
+                                aria-label={`Go to slide ${i + 1}`}
+                                className={`transition-all duration-300 rounded-full ${
+                                    i === currentSlide
+                                        ? "w-6 h-1.5 bg-emerald-500 shadow-xs shadow-emerald-400/50"
+                                        : "w-1.5 h-1.5 bg-white/40 hover:bg-white/70"
+                                }`}
+                            />
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* ==================== 4 DEPARTMENT TEASER CARDS ==================== */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-5 sm:mt-7">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+                    {DEPARTMENT_CARDS.map((card) => (
+                        <Link
+                            key={card.title}
+                            href={card.href}
+                            className="group relative overflow-hidden rounded-xl sm:rounded-2xl aspect-[4/5] sm:aspect-[3/4] block cursor-pointer bg-stone-900 shadow-xs hover:shadow-xl transition-all duration-300 border border-transparent hover:border-emerald-500/20"
+                        >
+                            {/* Card Image with Subtle Zoom on Hover */}
+                            <img
+                                src={card.image}
+                                alt={card.alt}
+                                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+                            />
+
+                            {/* Card Bottom Shadow Gradient */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
+
+                            {/* Card Content (Bottom Aligned) */}
+                            <div className="absolute bottom-0 inset-x-0 p-4 sm:p-5 flex flex-col justify-end text-white pointer-events-none">
+                                <h3 className="font-serif text-lg sm:text-xl md:text-2xl font-normal text-white mb-0.5 tracking-tight drop-shadow-xs">
+                                    {card.title}
+                                </h3>
+                                <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-stone-200 group-hover:text-emerald-300 font-normal transition-all group-hover:translate-x-1">
+                                    Shop Now
+                                    <ArrowRight className="w-3.5 h-3.5 group-hover:text-emerald-400 transition-colors" />
+                                </span>
                             </div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-stone-500 leading-none">Global Distribution</p>
+                        </Link>
+                    ))}
+                </div>
+            </div>
+
+            {/* ==================== WATCH FILM VIDEO MODAL ==================== */}
+            {isVideoModalOpen && (
+                <div
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fade-in"
+                    onClick={() => setIsVideoModalOpen(false)}
+                >
+                    <div
+                        className="relative w-full max-w-4xl bg-stone-950 rounded-2xl overflow-hidden shadow-2xl border border-white/10"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+                            <div>
+                                <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-emerald-400">
+                                    LUMIÈRE CAMPAIGN FILM
+                                </span>
+                                <h4 className="font-serif text-lg text-white">Modern Essentials • Season 2026</h4>
+                            </div>
+                            <button
+                                onClick={() => setIsVideoModalOpen(false)}
+                                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        {/* Video Container */}
+                        <div className="relative aspect-video w-full bg-black flex items-center justify-center">
+                            <video
+                                autoPlay
+                                controls
+                                playsInline
+                                className="w-full h-full object-cover"
+                                poster="/images/hero/hero-banner.jpg"
+                            >
+                                <source
+                                    src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+                                    type="video/mp4"
+                                />
+                                Your browser does not support the video tag.
+                            </video>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            {/* Kinetic Scroll Anchor */}
-            <div className={`absolute bottom-12 left-1/2 -translate-x-1/2 z-30 transition-all duration-1000 delay-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
-                <div className="flex flex-col items-center gap-4 group cursor-pointer">
-                    <span className="text-[9px] font-black uppercase tracking-[0.6em] text-white/30 group-hover:text-emerald-400 transition-colors">Discover Abyss</span>
-                    <div className="w-px h-24 bg-linear-to-b from-emerald-500 via-emerald-500/20 to-transparent relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-full bg-white animate-scroll-line" />
-                    </div>
-                    <MoveDown className="w-4 h-4 text-emerald-500 group-hover:translate-y-2 transition-transform" />
-                </div>
-            </div>
-
-            {/* Vignette & Grain */}
-            <div className="absolute inset-0 z-40 pointer-events-none bg-radial-vignette opacity-50" />
-            <div className="absolute inset-0 z-40 pointer-events-none opacity-[0.03] bg-grain" />
-
-            <style jsx global>{`
-                @keyframes scroll-line {
-                    0% { transform: translateY(-100%); }
-                    100% { transform: translateY(100%); }
-                }
-                .animate-scroll-line {
-                    animation: scroll-line 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-                }
-                .bg-radial-vignette {
-                    background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
-                }
-                .bg-grain {
-                    background-image: url("https://grainy-gradients.vercel.app/noise.svg");
-                }
-            `}</style>
+            )}
         </section>
     );
 };

@@ -79,7 +79,7 @@ const TrendingProducts = ({ onQuickView, products = [] }) => {
                         <span className="text-transparent bg-clip-text bg-linear-to-r from-emerald-400 via-white to-emerald-600 animate-gradient-text">Laboratory</span>
                     </h2>
 
-                    <p className="text-stone-400 font-medium text-lg sm:text-xl max-w-2xl leading-relaxed mb-12">
+                    {/* <p className="text-stone-400 font-medium text-lg sm:text-xl max-w-2xl leading-relaxed mb-12">
                         Real-time editorial drops designed for the top 1%. <br className="hidden sm:block" />
                         Where algorithmic precision meets haute couture.
                     </p>
@@ -93,7 +93,7 @@ const TrendingProducts = ({ onQuickView, products = [] }) => {
                             <ArrowUpRight className="w-5 h-5 group-hover:rotate-45 transition-transform duration-500" />
                         </div>
                         <div className="absolute inset-0 bg-linear-to-r from-emerald-50 via-white to-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </Link>
+                    </Link> */}
                 </div>
 
                 {/* Kinetic Depth Grid */}
