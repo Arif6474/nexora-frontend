@@ -25,7 +25,7 @@ function Home() {
 
       <NewArrivals onQuickView={setSelectedProduct} products={data?.latestProducts} />
 
-      <Testimonials />
+      <Testimonials testimonials={data?.testimonials} />
 
       <QuickViewModal
         product={selectedProduct}

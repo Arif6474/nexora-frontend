@@ -24,5 +24,6 @@ export const BRANDS_API = API_BASE_URL + 'getAllBrands'
 export const SUBCATEGORIES_BY_CATEGORY_API = API_BASE_URL + 'getSubCategoriesByCategoryId/'
 export const SINGLE_PRODUCT_API = API_BASE_URL + 'getSingleProductDetails/'
 export const SINGLE_PRODUCT_BY_SLUG_API = API_BASE_URL + 'getSingleProductBySlug/'
+export const TESTIMONIALS_API = API_BASE_URL + 'getAllTestimonials'
 
 
