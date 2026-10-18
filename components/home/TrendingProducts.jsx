@@ -6,7 +6,7 @@ import ProductCard from "../shop/ProductCard";
 import { allProducts } from "@/app/data/products";
 import Link from "next/link";
 
-const TrendingProducts = ({ onQuickView }) => {
+const TrendingProducts = ({ onQuickView, products = [] }) => {
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const sectionRef = useRef(null);
 
@@ -20,9 +20,13 @@ const TrendingProducts = ({ onQuickView }) => {
         { id: 4, rank: "06", scale: "scale-105", offset: "translate-y-16" },
     ];
 
-    const trendingProducts = trendingConfigs.map(config => ({
-        ...allProducts.find(p => p.id === config.id),
-        ...config
+    const sourceProducts = products && products.length > 0
+        ? products.slice(0, 6)
+        : trendingConfigs.map(config => allProducts.find(p => p.id === config.id));
+
+    const trendingProducts = sourceProducts.map((prod, idx) => ({
+        ...prod,
+        ...(trendingConfigs[idx] || { rank: `0${idx + 1}`, scale: "scale-100", offset: "" })
     }));
 
     useEffect(() => {
@@ -96,7 +100,7 @@ const TrendingProducts = ({ onQuickView }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-24">
                     {trendingProducts.map((product, idx) => (
                         <div
-                            key={product.id}
+                            key={product._id || product.id || idx}
                             className={`group relative animate-kinetic-entry`}
                             style={{ animationDelay: `${idx * 200}ms` }}
                         >

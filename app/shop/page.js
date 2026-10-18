@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import FilterSection from "../../components/shop/FilterSection";
 import SortDropdown from "../../components/shop/SortDropdown";
 import ProductCard from "../../components/shop/ProductCard";
@@ -9,7 +10,10 @@ import { Grid3x3, LayoutGrid, Loader2 } from "lucide-react";
 import useFetch from "@/utils/hooks/useFetch";
 import { GET_ALL_PRODUCTS_WITH_QUERY_API } from "@/utils/APIs";
 
-const ShopPage = () => {
+const ShopContent = () => {
+    const searchParams = useSearchParams();
+    const categoryParam = searchParams.get("category") || "";
+
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [sortBy, setSortBy] = useState("newest");
     const [viewMode, setViewMode] = useState("4-col");
@@ -17,10 +21,17 @@ const ShopPage = () => {
 
     // Filter state
     const [selectedFilters, setSelectedFilters] = useState({
-        category: "",
+        category: categoryParam,
         subcategory: "",
         brand: "",
     });
+
+    useEffect(() => {
+        const cat = searchParams.get("category");
+        if (cat) {
+            setSelectedFilters(prev => ({ ...prev, category: cat }));
+        }
+    }, [searchParams]);
 
     // Build query parameters
     const queryParams = new URLSearchParams();
@@ -156,6 +167,18 @@ const ShopPage = () => {
                 onClose={() => setQuickViewProduct(null)}
             />
         </div>
+    );
+};
+
+const ShopPage = () => {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+            </div>
+        }>
+            <ShopContent />
+        </Suspense>
     );
 };
 

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import Hero from '../components/Hero'
+import CategorySection from '../components/home/CategorySection'
 import TrendingProducts from '../components/home/TrendingProducts'
 import NewArrivals from '../components/home/NewArrivals'
 import Testimonials from '../components/home/Testimonials'
@@ -18,7 +19,9 @@ function Home() {
     <main className="min-h-screen bg-stone-50">
       <Hero />
 
-      <TrendingProducts onQuickView={setSelectedProduct} />
+      <CategorySection />
+
+      <TrendingProducts onQuickView={setSelectedProduct} products={data?.featuredProducts} />
 
       <NewArrivals onQuickView={setSelectedProduct} products={data?.latestProducts} />
 
