@@ -5,14 +5,72 @@ import { ChevronDown, ChevronUp, X, SlidersHorizontal, Loader2 } from "lucide-re
 import useFetch from "@/utils/hooks/useFetch";
 import { CATEGORIES_API, BRANDS_API, SUBCATEGORIES_BY_CATEGORY_API } from "@/utils/APIs";
 
+const GENDER_OPTIONS = [
+    { _id: "Women", name: "Women's Collection" },
+    { _id: "Men", name: "Men's Collection" },
+  
+];
+
+const FilterRadio = ({ label, checked, onChange, name }) => (
+    <label className="flex items-center gap-3 py-2 cursor-pointer group">
+        <div className="relative">
+            <input
+                type="radio"
+                name={name}
+                checked={checked}
+                onChange={onChange}
+                className="peer sr-only"
+            />
+            <div className="w-5 h-5 border-2 border-stone-300 rounded-full peer-checked:border-emerald-600 transition-all group-hover:border-emerald-500" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-emerald-600 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity" />
+        </div>
+        <span className={`text-sm font-medium transition-colors ${checked ? "text-emerald-700 font-bold" : "text-stone-700 group-hover:text-stone-900"}`}>
+            {label}
+        </span>
+    </label>
+);
+
+const FilterGroup = ({ title, items, type, isExpanded, selectedFilters, toggleSection, handleFilterChange }) => (
+    <div className="border-b border-stone-200 last:border-0">
+        <button
+            onClick={() => toggleSection(type)}
+            className="w-full flex items-center justify-between py-4 text-left group cursor-pointer"
+        >
+            <span className="text-sm font-black uppercase tracking-wider text-stone-900">{title}</span>
+            {isExpanded ? (
+                <ChevronUp className="w-4 h-4 text-stone-500 group-hover:text-emerald-600 transition-colors" />
+            ) : (
+                <ChevronDown className="w-4 h-4 text-stone-500 group-hover:text-emerald-600 transition-colors" />
+            )}
+        </button>
+        {isExpanded && (
+            <div className="pb-4 space-y-1">
+                {items && items.length > 0 ? (
+                    items.map((item) => (
+                        <FilterRadio
+                            key={item._id}
+                            label={item.name}
+                            name={type}
+                            checked={selectedFilters[type] === item._id || selectedFilters[type] === item.slug}
+                            onChange={() => handleFilterChange(type, item._id || item.slug)}
+                        />
+                    ))
+                ) : (
+                    <p className="text-sm text-stone-500 italic py-2">
+                        {type === 'subcategory' && !selectedFilters.category ? 'Select a category first' : 'No options available'}
+                    </p>
+                )}
+            </div>
+        )}
+    </div>
+);
+
 const FilterSection = ({ isOpen, onToggle, selectedFilters, onFilterChange }) => {
     const [expandedSections, setExpandedSections] = useState({
+        gender: true,
         category: true,
         subcategory: false,
         brand: false,
-        size: false,
-        color: false,
-        discount: false,
     });
 
     const toggleSection = (section) => {
@@ -35,76 +93,22 @@ const FilterSection = ({ isOpen, onToggle, selectedFilters, onFilterChange }) =>
             category: "",
             subcategory: "",
             brand: "",
-            size: "",
-            color: "",
-            discount: "",
+            gender: "",
+            searchQuery: "",
         });
     };
 
-    const totalActiveFilters = Object.values(selectedFilters).filter(v => v !== "").length;
+    const totalActiveFilters = Object.entries(selectedFilters || {})
+        .filter(([key, val]) => val !== "" && val !== null && val !== undefined)
+        .length;
 
     // Fetch dynamic data
     const { data: categories = [], isLoading: isLoadingCats } = useFetch(CATEGORIES_API);
     const { data: brands = [], isLoading: isLoadingBrands } = useFetch(BRANDS_API);
 
     const { data: subcategories = [], isLoading: isLoadingSubcats } = useFetch(
-        selectedFilters.category ? `${SUBCATEGORIES_BY_CATEGORY_API}${selectedFilters.category}` : null,
-        !!selectedFilters.category
-    );
-
-    // Optional: Hide sizes, colors, and static discounts if not supported by backend.
-    // We'll keep them as empty arrays for now if unused, or remove them entirely from rendering.
-
-    const FilterRadio = ({ label, checked, onChange, name }) => (
-        <label className="flex items-center gap-3 py-2 cursor-pointer group">
-            <div className="relative">
-                <input
-                    type="radio"
-                    name={name}
-                    checked={checked}
-                    onChange={onChange}
-                    className="peer sr-only"
-                />
-                <div className="w-5 h-5 border-2 border-stone-300 rounded-full peer-checked:border-emerald-600 transition-all group-hover:border-emerald-500" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-emerald-600 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity" />
-            </div>
-            <span className="text-sm font-medium text-stone-700 group-hover:text-stone-900">{label}</span>
-        </label>
-    );
-
-    const FilterGroup = ({ title, items, type, isExpanded }) => (
-        <div className="border-b border-stone-200 last:border-0">
-            <button
-                onClick={() => toggleSection(type)}
-                className="w-full flex items-center justify-between py-4 text-left group"
-            >
-                <span className="text-sm font-black uppercase tracking-wider text-stone-900">{title}</span>
-                {isExpanded ? (
-                    <ChevronUp className="w-4 h-4 text-stone-500 group-hover:text-emerald-600 transition-colors" />
-                ) : (
-                    <ChevronDown className="w-4 h-4 text-stone-500 group-hover:text-emerald-600 transition-colors" />
-                )}
-            </button>
-            {isExpanded && (
-                <div className="pb-4 space-y-1">
-                    {items && items.length > 0 ? (
-                        items.map((item) => (
-                            <FilterRadio
-                                key={item._id}
-                                label={item.name}
-                                name={type}
-                                checked={selectedFilters[type] === item._id}
-                                onChange={() => handleFilterChange(type, item._id)}
-                            />
-                        ))
-                    ) : (
-                        <p className="text-sm text-stone-500 italic py-2">
-                            {type === 'subcategory' && !selectedFilters.category ? 'Select a category first' : 'No options available'}
-                        </p>
-                    )}
-                </div>
-            )}
-        </div>
+        selectedFilters?.category ? `${SUBCATEGORIES_BY_CATEGORY_API}${selectedFilters.category}` : null,
+        !!selectedFilters?.category
     );
 
     return (
@@ -112,7 +116,7 @@ const FilterSection = ({ isOpen, onToggle, selectedFilters, onFilterChange }) =>
             {/* Mobile Filter Toggle Button */}
             <button
                 onClick={onToggle}
-                className="lg:hidden fixed bottom-6 right-6 z-50 w-14 h-14 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+                className="lg:hidden fixed bottom-6 right-6 z-50 w-14 h-14 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
             >
                 <SlidersHorizontal className="w-6 h-6" />
                 {totalActiveFilters > 0 && (
@@ -141,7 +145,7 @@ const FilterSection = ({ isOpen, onToggle, selectedFilters, onFilterChange }) =>
                         </div>
                         <button
                             onClick={onToggle}
-                            className="lg:hidden w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center transition-colors"
+                            className="lg:hidden w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center transition-colors cursor-pointer"
                         >
                             <X className="w-5 h-5 text-stone-500" />
                         </button>
@@ -151,7 +155,7 @@ const FilterSection = ({ isOpen, onToggle, selectedFilters, onFilterChange }) =>
                     {totalActiveFilters > 0 && (
                         <button
                             onClick={clearAllFilters}
-                            className="w-full mb-6 py-2 px-4 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-sm rounded-lg transition-colors"
+                            className="w-full mb-6 py-2 px-4 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-sm rounded-lg transition-colors cursor-pointer"
                         >
                             Clear All Filters
                         </button>
@@ -160,22 +164,40 @@ const FilterSection = ({ isOpen, onToggle, selectedFilters, onFilterChange }) =>
                     {/* Filter Groups */}
                     <div className="space-y-0">
                         <FilterGroup
+                            title="Department"
+                            items={GENDER_OPTIONS}
+                            type="gender"
+                            isExpanded={expandedSections.gender}
+                            selectedFilters={selectedFilters}
+                            toggleSection={toggleSection}
+                            handleFilterChange={handleFilterChange}
+                        />
+                        <FilterGroup
                             title="Category"
                             items={categories}
                             type="category"
                             isExpanded={expandedSections.category}
+                            selectedFilters={selectedFilters}
+                            toggleSection={toggleSection}
+                            handleFilterChange={handleFilterChange}
                         />
                         <FilterGroup
                             title="Subcategory"
                             items={subcategories}
                             type="subcategory"
                             isExpanded={expandedSections.subcategory}
+                            selectedFilters={selectedFilters}
+                            toggleSection={toggleSection}
+                            handleFilterChange={handleFilterChange}
                         />
                         <FilterGroup
                             title="Brand"
                             items={brands}
                             type="brand"
                             isExpanded={expandedSections.brand}
+                            selectedFilters={selectedFilters}
+                            toggleSection={toggleSection}
+                            handleFilterChange={handleFilterChange}
                         />
                     </div>
                 </div>

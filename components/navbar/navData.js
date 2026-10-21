@@ -49,5 +49,5 @@ export const navLinks = [
             }
         ],
     },
-    { name: "Collections", href: "/collections" },
+    // { name: "Collections", href: "/collections" },
 ];

@@ -5,10 +5,13 @@ import Link from "next/link";
 
 const ProductCard = ({ product, onQuickView }) => {
     const { toggleWishlist, isInWishlist } = useWishlist();
-    const isWishlisted = isInWishlist(product._id);
+    if (!product) return null;
+
     const {
         _id,
+        id,
         title,
+        name,
         price,
         originalPrice,
         discount,
@@ -19,15 +22,27 @@ const ProductCard = ({ product, onQuickView }) => {
         slug
     } = product;
 
+    const productId = _id || id;
+    const isWishlisted = isInWishlist(productId);
+    const displayTitle = title || name || "Product";
+    const productSlug = slug || productId;
+
+    const spacesUrl = (process.env.NEXT_PUBLIC_SPACES_URL || "").trim();
+    const resolvedImage = image
+        ? (image.startsWith("http://") || image.startsWith("https://")
+            ? image
+            : `${spacesUrl.replace(/\/$/, '')}/${image.replace(/^\//, '')}`)
+        : "/api/placeholder/400/533";
+
     const discountPercent = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : discount;
 
     return (
         <div className="group relative bg-white rounded-2xl overflow-hidden border border-stone-200 hover:border-emerald-500/30 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-900/10">
             {/* Image Container */}
-            <Link href={`/product/${slug}`} className="relative block aspect-[3/4] overflow-hidden bg-stone-100">
+            <Link href={`/product/${productSlug}`} className="relative block aspect-[3/4] overflow-hidden bg-stone-100">
                 <img
-                    src={process.env.NEXT_PUBLIC_SPACES_URL + image || "/api/placeholder/400/533"}
-                    alt={title}
+                    src={resolvedImage}
+                    alt={displayTitle}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
 
@@ -50,7 +65,8 @@ const ProductCard = ({ product, onQuickView }) => {
                             e.preventDefault();
                             onQuickView?.(product);
                         }}
-                        className="w-12 h-12 rounded-full bg-white hover:bg-emerald-600 flex items-center justify-center transition-all hover:scale-110 shadow-lg group/btn"
+                        className="w-12 h-12 rounded-full bg-white hover:bg-emerald-600 flex items-center justify-center transition-all hover:scale-110 shadow-lg group/btn cursor-pointer"
+                        title="Quick View"
                     >
                         <Eye className="w-5 h-5 text-stone-900 group-hover/btn:text-white transition-colors" />
                     </button>
@@ -59,7 +75,8 @@ const ProductCard = ({ product, onQuickView }) => {
                             e.preventDefault();
                             toggleWishlist(product);
                         }}
-                        className="w-12 h-12 rounded-full bg-white hover:bg-emerald-600 flex items-center justify-center transition-all hover:scale-110 shadow-lg group/btn"
+                        className="w-12 h-12 rounded-full bg-white hover:bg-emerald-600 flex items-center justify-center transition-all hover:scale-110 shadow-lg group/btn cursor-pointer"
+                        title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
                     >
                         <Heart
                             className={`w-5 h-5 transition-colors ${isWishlisted ? "fill-emerald-600 text-emerald-600" : "text-stone-900 group-hover/btn:text-white"
@@ -71,27 +88,11 @@ const ProductCard = ({ product, onQuickView }) => {
 
             {/* Product Info */}
             <div className="p-4">
-                <Link href={`/product/${slug || _id}`}>
+                <Link href={`/product/${productSlug}`}>
                     <h3 className="text-sm font-bold text-stone-900 mb-2 line-clamp-2 group-hover:text-emerald-600 transition-colors">
-                        {title}
+                        {displayTitle}
                     </h3>
                 </Link>
-
-                {/* Rating */}
-                {/* <div className="flex items-center gap-2 mb-3">
-                    <div className="flex items-center gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                            <Star
-                                key={i}
-                                className={`w-3.5 h-3.5 ${i < Math.floor(rating)
-                                    ? "fill-amber-400 text-amber-400"
-                                    : "fill-stone-200 text-stone-200"
-                                    }`}
-                            />
-                        ))}
-                    </div>
-                    <span className="text-xs text-stone-500 font-medium">({reviews})</span>
-                </div> */}
 
                 {/* Price */}
                 <div className="flex items-center gap-2 ">
@@ -100,12 +101,6 @@ const ProductCard = ({ product, onQuickView }) => {
                         <span className="text-sm font-medium text-stone-400 line-through">${originalPrice}</span>
                     )}
                 </div>
-
-                {/* Add to Cart Button */}
-                {/* <button className="w-full py-3 bg-stone-900 hover:bg-emerald-600 text-white font-black uppercase tracking-wider text-xs rounded-xl transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 shadow-lg">
-                    <ShoppingCart className="w-4 h-4" />
-                    Add to Cart
-                </button> */}
             </div>
         </div>
     );

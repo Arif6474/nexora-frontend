@@ -46,19 +46,19 @@ const HERO_SLIDES = [
 const DEPARTMENT_CARDS = [
     {
         title: "Women",
-        href: "/shop?search=Women",
+        href: "/shop?gender=Women",
         image: "/images/hero/dept-women.jpg",
         alt: "Women's Collection - Tailored coats and dresses",
     },
     {
         title: "Men",
-        href: "/shop?search=Men",
+        href: "/shop?gender=Men",
         image: "/images/hero/dept-men.jpg",
         alt: "Men's Collection - Tailored blazers and knitwear",
     },
     {
         title: "Bags",
-        href: "/shop?search=Bag",
+        href: "/shop?category=bags-handbags",
         image: "/images/hero/dept-bags.jpg",
         alt: "Luxury Handbags - Italian leather shoulder bags",
     },
