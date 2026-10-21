@@ -1,8 +1,17 @@
 export const getAvatarUrl = (user) => {
     if (!user) return null;
     const raw = user.image || user.avatar;
-    if (!raw || typeof raw !== "string" || !raw.trim()) return null;
+    if (!raw || typeof raw !== "string") return null;
     const trimmed = raw.trim();
+    if (
+        !trimmed ||
+        trimmed === "undefined" ||
+        trimmed === "null" ||
+        trimmed === "none" ||
+        trimmed.includes("/api/placeholder")
+    ) {
+        return null;
+    }
     if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("/")) {
         return trimmed;
     }

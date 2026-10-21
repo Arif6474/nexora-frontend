@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import ProfileSidebar from "@/components/profile/ProfileSidebar";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -20,26 +21,19 @@ export default function ProfileLayout({ children }) {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#FDFCFB] pt-12 pb-24 px-4">
+            <div className="min-h-screen bg-[#FDFCFB] pt-8 sm:pt-12 pb-24 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-6xl mx-auto">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                        <aside className="lg:col-span-3">
-                            <div className="space-y-3">
-                                <Skeleton className="h-4 w-28 rounded-md mb-4 ml-6" />
-                                {[1, 2, 3].map((i) => (
-                                    <Skeleton key={i} className="h-14 w-full rounded-2xl" />
-                                ))}
-                            </div>
+                    <div className="mb-8 space-y-2">
+                        <Skeleton className="h-4 w-32 rounded-md" />
+                        <Skeleton className="h-8 w-64 rounded-xl" />
+                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+                        <aside className="lg:col-span-4 xl:col-span-3">
+                            <Skeleton className="h-80 w-full rounded-[32px]" />
                         </aside>
-                        <main className="lg:col-span-9 space-y-8">
-                            <div className="flex items-center gap-6">
-                                <Skeleton className="w-32 h-32 rounded-[40px] flex-shrink-0" />
-                                <div className="space-y-2 flex-1">
-                                    <Skeleton className="h-8 w-48 rounded-xl" />
-                                    <Skeleton className="h-4 w-36 rounded-md opacity-70" />
-                                </div>
-                            </div>
-                            <Skeleton className="h-80 w-full rounded-[40px]" />
+                        <main className="lg:col-span-8 xl:col-span-9 space-y-8">
+                            <Skeleton className="h-44 w-full rounded-[32px]" />
+                            <Skeleton className="h-96 w-full rounded-[36px]" />
                         </main>
                     </div>
                 </div>
@@ -50,24 +44,32 @@ export default function ProfileLayout({ children }) {
     if (!user) return null;
 
     return (
-        <div className="min-h-screen bg-[#FDFCFB] pt-12 pb-24 px-4">
+        <div className="min-h-screen bg-[#FDFCFB] pt-8 sm:pt-12 pb-24 px-4 sm:px-6 lg:px-8">
             <div className="max-w-6xl mx-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                {/* Header Breadcrumb */}
+                <div className="mb-8">
+                    <div className="flex items-center gap-2 text-xs font-black text-stone-400 uppercase tracking-widest mb-1.5">
+                        <Link href="/" className="hover:text-emerald-700 transition-colors">Home</Link>
+                        <span>/</span>
+                        <span className="text-stone-700">Account</span>
+                    </div>
+                    <h1 className="text-2xl sm:text-3xl font-black text-stone-900 uppercase tracking-tight">Customer Portal</h1>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
                     {/* Sidebar Area */}
-                    <aside className="lg:col-span-3">
+                    <aside className="lg:col-span-4 xl:col-span-3">
                         <div className="sticky top-28">
                             <ProfileSidebar />
                         </div>
                     </aside>
 
                     {/* Main Content Area */}
-                    <main className="lg:col-span-9">
+                    <main className="lg:col-span-8 xl:col-span-9 min-w-0">
                         {children}
                     </main>
                 </div>
             </div>
-
-
         </div>
     );
 }
