@@ -4,11 +4,13 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { User, Mail, Phone, MapPin, Save, Camera } from "lucide-react";
 import Skeleton from "@/components/ui/Skeleton";
+import { getAvatarUrl, getInitials } from "@/utils/avatar";
 import toast from "react-hot-toast";
 
 export default function ProfileForm() {
     const { user, updateProfile, loading } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
+    const [imageError, setImageError] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -16,6 +18,13 @@ export default function ProfileForm() {
         address: "",
         bio: ""
     });
+
+    const avatarUrl = getAvatarUrl(user);
+    const initials = getInitials(user?.name);
+
+    useEffect(() => {
+        setImageError(false);
+    }, [avatarUrl]);
 
     useEffect(() => {
         if (user) {
@@ -72,12 +81,21 @@ export default function ProfileForm() {
             {/* Header Section */}
             <div className="flex flex-col md:flex-row items-center gap-8 mb-12">
                 <div className="relative group">
-                    <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-[40px] overflow-hidden border-4 border-white shadow-2xl relative">
-                        <img
-                            src={user.avatar || "/api/placeholder/400/400"}
-                            alt={user.name}
-                            className="w-full h-full object-cover"
-                        />
+                    <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-[40px] overflow-hidden border-4 border-white shadow-2xl relative bg-emerald-100 flex items-center justify-center">
+                        {avatarUrl && !imageError ? (
+                            <img
+                                src={avatarUrl}
+                                alt={user.name || "User"}
+                                onError={() => setImageError(true)}
+                                className="w-full h-full object-cover"
+                            />
+                        ) : initials ? (
+                            <span className="text-emerald-800 font-black text-4xl sm:text-5xl uppercase tracking-wider select-none">
+                                {initials}
+                            </span>
+                        ) : (
+                            <User className="w-16 h-16 text-emerald-700" />
+                        )}
                         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <Camera className="text-white w-8 h-8" />
                         </div>

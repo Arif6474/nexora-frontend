@@ -3,6 +3,7 @@ import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useRef, useEffect } from "react";
+import { getAvatarUrl, getInitials } from "@/utils/avatar";
 import Link from "next/link";
 
 const ActionIcons = ({
@@ -17,7 +18,15 @@ const ActionIcons = ({
     const { cartCount } = useCart();
     const { user, logout } = useAuth();
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+    const [imageError, setImageError] = useState(false);
     const menuRef = useRef(null);
+
+    const avatarUrl = getAvatarUrl(user);
+    const initials = getInitials(user?.name);
+
+    useEffect(() => {
+        setImageError(false);
+    }, [avatarUrl]);
 
     // Close menu when clicking outside
     useEffect(() => {
@@ -53,8 +62,21 @@ const ActionIcons = ({
                         onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                         className={`p-1.5 flex items-center gap-2 rounded-2xl transition-all duration-300 ${isUserMenuOpen ? "bg-stone-900 text-white shadow-lg" : "text-stone-500 hover:text-emerald-700 hover:bg-stone-100/50"}`}
                     >
-                        <div className="w-8 h-8 rounded-xl overflow-hidden bg-emerald-100 border border-emerald-200">
-                            <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                        <div className="w-8 h-8 rounded-xl overflow-hidden bg-emerald-100 border border-emerald-200 flex items-center justify-center flex-shrink-0">
+                            {avatarUrl && !imageError ? (
+                                <img
+                                    src={avatarUrl}
+                                    alt={user.name || "User"}
+                                    onError={() => setImageError(true)}
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : initials ? (
+                                <span className="text-emerald-800 font-black text-xs uppercase tracking-tight select-none">
+                                    {initials}
+                                </span>
+                            ) : (
+                                <User className="w-4 h-4 text-emerald-700" />
+                            )}
                         </div>
                         <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${isUserMenuOpen ? "rotate-180" : ""}`} />
                     </button>
@@ -62,9 +84,30 @@ const ActionIcons = ({
                     {/* Dropdown Menu */}
                     {isUserMenuOpen && (
                         <div className="absolute top-full right-0 mt-3 w-64 bg-white rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-stone-100/50 overflow-hidden py-3 z-50 animate-fade-in-up">
-                            <div className="px-6 py-4 border-b border-stone-50 mb-2">
-                                <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest leading-none mb-1">Welcome back</p>
-                                <p className="text-sm font-black text-stone-900 uppercase truncate">{user.name}</p>
+                            <div className="px-6 py-4 border-b border-stone-50 mb-2 flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-2xl overflow-hidden bg-emerald-100 border border-emerald-200 flex items-center justify-center flex-shrink-0">
+                                    {avatarUrl && !imageError ? (
+                                        <img
+                                            src={avatarUrl}
+                                            alt={user.name || "User"}
+                                            onError={() => setImageError(true)}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : initials ? (
+                                        <span className="text-emerald-800 font-black text-sm uppercase tracking-tight select-none">
+                                            {initials}
+                                        </span>
+                                    ) : (
+                                        <User className="w-5 h-5 text-emerald-700" />
+                                    )}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest leading-none mb-1">Welcome back</p>
+                                    <p className="text-sm font-black text-stone-900 uppercase truncate">{user.name}</p>
+                                    {user.email && (
+                                        <p className="text-[11px] text-stone-400 font-medium truncate mt-0.5">{user.email}</p>
+                                    )}
+                                </div>
                             </div>
 
                             <Link
