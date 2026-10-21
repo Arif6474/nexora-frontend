@@ -25,5 +25,6 @@ export const SUBCATEGORIES_BY_CATEGORY_API = API_BASE_URL + 'getSubCategoriesByC
 export const SINGLE_PRODUCT_API = API_BASE_URL + 'getSingleProductDetails/'
 export const SINGLE_PRODUCT_BY_SLUG_API = API_BASE_URL + 'getSingleProductBySlug/'
 export const TESTIMONIALS_API = API_BASE_URL + 'getAllTestimonials'
+export const SEARCH_PRODUCTS_API = API_BASE_URL + 'getAllProductsWithSearch'
 
 

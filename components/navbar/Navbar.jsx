@@ -12,6 +12,8 @@ import WishlistSidebar from "./WishlistSidebar";
 import CartSidebar from "./CartSidebar";
 import { allProducts } from "../../app/data/products";
 import { useAuth } from "@/context/AuthContext";
+import { SEARCH_PRODUCTS_API } from "@/utils/APIs";
+import axios from "axios";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -45,24 +47,38 @@ const Navbar = () => {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    // Search Logic
+    // Live API Search Logic with Debounce & Cancellation
     useEffect(() => {
-        if (searchQuery.trim() === "") {
+        const query = searchQuery.trim();
+        if (!query) {
             setFilteredProducts([]);
+            setIsSearching(false);
             return;
         }
 
         setIsSearching(true);
-        const timer = setTimeout(() => {
-            const results = allProducts.filter(p =>
-                p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                p.category.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            setFilteredProducts(results);
-            setIsSearching(false);
-        }, 300);
+        const controller = new AbortController();
 
-        return () => clearTimeout(timer);
+        const timer = setTimeout(async () => {
+            try {
+                const res = await axios.get(`${SEARCH_PRODUCTS_API}?searchQuery=${encodeURIComponent(query)}`, {
+                    signal: controller.signal
+                });
+                setFilteredProducts(Array.isArray(res.data) ? res.data : []);
+            } catch (err) {
+                if (err?.name !== 'CanceledError' && err?.code !== 'ERR_CANCELED') {
+                    console.error("Search fetch error:", err);
+                    setFilteredProducts([]);
+                }
+            } finally {
+                setIsSearching(false);
+            }
+        }, 250);
+
+        return () => {
+            clearTimeout(timer);
+            controller.abort();
+        };
     }, [searchQuery]);
 
     // Global Scroll Lock (Search Modal only, AuthModal handles its own)

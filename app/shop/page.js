@@ -6,7 +6,7 @@ import FilterSection from "../../components/shop/FilterSection";
 import SortDropdown from "../../components/shop/SortDropdown";
 import ProductCard from "../../components/shop/ProductCard";
 import QuickViewModal from "../../components/shop/QuickViewModal";
-import { Grid3x3, LayoutGrid, Loader2, X, RotateCcw } from "lucide-react";
+import { Grid3x3, LayoutGrid, Loader2, X, RotateCcw, Search } from "lucide-react";
 import useFetch from "@/utils/hooks/useFetch";
 import { GET_ALL_PRODUCTS_WITH_QUERY_API, CATEGORIES_API } from "@/utils/APIs";
 
@@ -147,14 +147,44 @@ const ShopContent = () => {
                     <div className="flex-1 min-w-0">
                         {/* Top Bar */}
                         <div className="bg-white border-b border-stone-200 px-4 sm:px-8 py-4 sticky top-0 z-10 shadow-xs">
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                                <div className="flex items-center gap-4">
-                                    <p className="text-sm font-medium text-stone-600">
+                            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+                                <div className="flex items-center gap-4 flex-wrap sm:flex-nowrap grow">
+                                    <p className="text-sm font-medium text-stone-600 shrink-0">
                                         Showing <span className="font-black text-stone-900">{products.length}</span> products
                                     </p>
+
+                                    {/* Instant Catalog Search Input */}
+                                    <form
+                                        onSubmit={(e) => {
+                                            e.preventDefault();
+                                            const val = e.currentTarget.elements.searchCatalog?.value || "";
+                                            updateFilters({ ...selectedFilters, searchQuery: val.trim() });
+                                        }}
+                                        className="relative w-full max-w-xs"
+                                    >
+                                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+                                        <input
+                                            key={selectedFilters.searchQuery}
+                                            name="searchCatalog"
+                                            defaultValue={selectedFilters.searchQuery}
+                                            type="text"
+                                            placeholder="Search pieces, coats, silk..."
+                                            className="w-full pl-9 pr-8 py-2 bg-stone-100 hover:bg-stone-50 focus:bg-white border border-stone-200 focus:border-emerald-600 rounded-xl text-xs font-semibold text-stone-900 placeholder:text-stone-400 outline-none transition-all"
+                                        />
+                                        {selectedFilters.searchQuery && (
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveFilter("searchQuery")}
+                                                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 p-0.5 cursor-pointer"
+                                                title="Clear search"
+                                            >
+                                                <X className="w-3.5 h-3.5" />
+                                            </button>
+                                        )}
+                                    </form>
                                 </div>
 
-                                <div className="flex items-center gap-3 w-full sm:w-auto">
+                                <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
                                     {/* View Mode Toggle */}
                                     <div className="hidden sm:flex items-center gap-2 bg-stone-100 rounded-lg p-1">
                                         <button
