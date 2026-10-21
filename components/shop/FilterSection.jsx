@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronDown, ChevronUp, X, SlidersHorizontal, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronUp, X, SlidersHorizontal } from "lucide-react";
+import Skeleton from "@/components/ui/Skeleton";
 import useFetch from "@/utils/hooks/useFetch";
 import { CATEGORIES_API, BRANDS_API, SUBCATEGORIES_BY_CATEGORY_API } from "@/utils/APIs";
 
@@ -30,7 +31,7 @@ const FilterRadio = ({ label, checked, onChange, name }) => (
     </label>
 );
 
-const FilterGroup = ({ title, items, type, isExpanded, selectedFilters, toggleSection, handleFilterChange }) => (
+const FilterGroup = ({ title, items, type, isExpanded, selectedFilters, toggleSection, handleFilterChange, isLoading }) => (
     <div className="border-b border-stone-200 last:border-0">
         <button
             onClick={() => toggleSection(type)}
@@ -45,7 +46,13 @@ const FilterGroup = ({ title, items, type, isExpanded, selectedFilters, toggleSe
         </button>
         {isExpanded && (
             <div className="pb-4 space-y-1">
-                {items && items.length > 0 ? (
+                {isLoading ? (
+                    <div className="space-y-2.5 py-1.5 pl-1">
+                        <Skeleton className="h-4 w-4/5 rounded-md" />
+                        <Skeleton className="h-4 w-2/3 rounded-md" />
+                        <Skeleton className="h-4 w-3/4 rounded-md" />
+                    </div>
+                ) : items && items.length > 0 ? (
                     items.map((item) => (
                         <FilterRadio
                             key={item._id}
@@ -180,6 +187,7 @@ const FilterSection = ({ isOpen, onToggle, selectedFilters, onFilterChange }) =>
                             selectedFilters={selectedFilters}
                             toggleSection={toggleSection}
                             handleFilterChange={handleFilterChange}
+                            isLoading={isLoadingCats}
                         />
                         <FilterGroup
                             title="Subcategory"
@@ -189,6 +197,7 @@ const FilterSection = ({ isOpen, onToggle, selectedFilters, onFilterChange }) =>
                             selectedFilters={selectedFilters}
                             toggleSection={toggleSection}
                             handleFilterChange={handleFilterChange}
+                            isLoading={isLoadingSubcats}
                         />
                         <FilterGroup
                             title="Brand"
@@ -198,6 +207,7 @@ const FilterSection = ({ isOpen, onToggle, selectedFilters, onFilterChange }) =>
                             selectedFilters={selectedFilters}
                             toggleSection={toggleSection}
                             handleFilterChange={handleFilterChange}
+                            isLoading={isLoadingBrands}
                         />
                     </div>
                 </div>

@@ -5,8 +5,10 @@ import { useSearchParams, useRouter } from "next/navigation";
 import FilterSection from "../../components/shop/FilterSection";
 import SortDropdown from "../../components/shop/SortDropdown";
 import ProductCard from "../../components/shop/ProductCard";
+import ProductCardSkeleton from "../../components/shop/ProductCardSkeleton";
+import ShopSkeleton from "../../components/shop/ShopSkeleton";
 import QuickViewModal from "../../components/shop/QuickViewModal";
-import { Grid3x3, LayoutGrid, Loader2, X, RotateCcw, Search } from "lucide-react";
+import { Grid3x3, LayoutGrid, X, RotateCcw, Search } from "lucide-react";
 import useFetch from "@/utils/hooks/useFetch";
 import { GET_ALL_PRODUCTS_WITH_QUERY_API, CATEGORIES_API } from "@/utils/APIs";
 
@@ -245,9 +247,15 @@ const ShopContent = () => {
                         {/* Product Grid */}
                         <div className="p-4 sm:p-8">
                             {isLoading ? (
-                                <div className="py-24 flex flex-col justify-center items-center gap-3">
-                                    <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
-                                    <p className="text-sm font-semibold text-stone-400">Loading pieces...</p>
+                                <div
+                                    className={`grid gap-4 sm:gap-6 ${viewMode === "4-col"
+                                        ? "grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                                        : "grid-cols-2 lg:grid-cols-3"
+                                        }`}
+                                >
+                                    {[...Array(8)].map((_, i) => (
+                                        <ProductCardSkeleton key={i} />
+                                    ))}
                                 </div>
                             ) : products.length === 0 ? (
                                 <div className="py-24 text-center max-w-md mx-auto space-y-4">
@@ -316,11 +324,7 @@ const ShopContent = () => {
 
 const ShopPage = () => {
     return (
-        <Suspense fallback={
-            <div className="min-h-screen bg-stone-50 flex items-center justify-center">
-                <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
-            </div>
-        }>
+        <Suspense fallback={<ShopSkeleton />}>
             <ShopContent />
         </Suspense>
     );

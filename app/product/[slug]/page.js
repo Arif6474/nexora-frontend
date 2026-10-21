@@ -18,6 +18,7 @@ import ProductVariants from "@/components/product/ProductVariants";
 import ProductActions from "@/components/product/ProductActions";
 import ProductTabs from "@/components/product/ProductTabs";
 import RelatedProducts from "@/components/product/RelatedProducts";
+import ProductDetailsSkeleton from "@/components/product/ProductDetailsSkeleton";
 
 const ProductDetailsPage = () => {
     const { slug } = useParams();
@@ -47,14 +48,7 @@ const ProductDetailsPage = () => {
     }, [product, apiProductImages]);
 
     if (isLoading) {
-        return (
-            <div className="min-h-screen bg-stone-50 flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-emerald-600/20 border-t-emerald-600 rounded-full animate-spin" />
-                    <p className="text-stone-400 font-black uppercase tracking-widest text-[10px]">Loading Nexora Style...</p>
-                </div>
-            </div>
-        );
+        return <ProductDetailsSkeleton />;
     }
 
     if (!product || error) {

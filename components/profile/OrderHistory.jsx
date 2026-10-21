@@ -13,6 +13,7 @@ import {
     Phone,
     Loader2
 } from "lucide-react";
+import Skeleton from "@/components/ui/Skeleton";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { GET_MY_ALL_ORDERS_API } from "@/utils/APIs";
@@ -88,9 +89,45 @@ export default function OrderHistory() {
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 animate-pulse">
-                <Loader2 className="w-12 h-12 text-stone-300 animate-spin mb-4" />
-                <p className="text-[10px] font-black uppercase tracking-widest text-stone-400">Loading Order History...</p>
+            <div className="space-y-8 animate-fade-in">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-10">
+                    <Skeleton className="h-8 w-44 rounded-xl" />
+                    <div className="flex gap-2 p-1.5 bg-stone-50 rounded-2xl border border-stone-100 overflow-x-auto no-scrollbar max-w-full">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                            <Skeleton key={i} className="h-8 w-20 rounded-xl" />
+                        ))}
+                    </div>
+                </div>
+
+                <div className="space-y-6">
+                    {[1, 2, 3].map((i) => (
+                        <div key={i} className="bg-white rounded-[32px] border border-stone-100 shadow-xl shadow-stone-200/20 overflow-hidden flex flex-col">
+                            <div className="p-6 sm:p-8 flex flex-wrap items-center justify-between gap-6 border-b border-stone-100/50">
+                                <div className="flex items-center gap-4">
+                                    <Skeleton className="w-12 h-12 rounded-2xl" />
+                                    <div className="space-y-1.5">
+                                        <Skeleton className="h-3 w-16 rounded" />
+                                        <Skeleton className="h-4 w-28 rounded-md" />
+                                    </div>
+                                </div>
+                                <div className="space-y-1.5">
+                                    <Skeleton className="h-3 w-12 rounded" />
+                                    <Skeleton className="h-4 w-20 rounded-md" />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <Skeleton className="h-3 w-12 rounded" />
+                                    <Skeleton className="h-4 w-16 rounded-md" />
+                                </div>
+                                <Skeleton className="h-8 w-28 rounded-full" />
+                            </div>
+                            <div className="p-6 sm:p-8 bg-stone-50/30 flex gap-4 overflow-x-auto no-scrollbar">
+                                {[1, 2, 3].map((thumb) => (
+                                    <Skeleton key={thumb} className="shrink-0 w-16 h-16 rounded-xl" />
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
         );
     }

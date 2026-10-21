@@ -6,7 +6,9 @@ import Link from "next/link";
 import { useWishlist } from "@/context/WishlistContext";
 import { takaFormator } from "@/utils/takaFormator";
 
-const NewArrivals = ({ onQuickView, products = [] }) => {
+import Skeleton from "@/components/ui/Skeleton";
+
+const NewArrivals = ({ onQuickView, products = [], isLoading }) => {
     const scrollContainerRef = useRef(null);
     const { toggleWishlist, isInWishlist } = useWishlist();
 
@@ -55,7 +57,22 @@ const NewArrivals = ({ onQuickView, products = [] }) => {
                     ref={scrollContainerRef}
                     className="flex gap-8 overflow-x-auto no-scrollbar pb-12 snap-x snap-mandatory"
                 >
-                    {products.map((product, idx) => (
+                    {isLoading ? (
+                        [...Array(4)].map((_, idx) => (
+                            <div
+                                key={idx}
+                                className="relative min-w-[300px] sm:min-w-[400px] aspect-4/5 snap-start overflow-hidden rounded-[40px] bg-stone-100 border border-stone-200 p-8 flex flex-col justify-end"
+                            >
+                                <Skeleton className="absolute inset-0 rounded-none bg-stone-200/70" />
+                                <div className="relative z-10 space-y-2">
+                                    <Skeleton className="h-4 w-28 bg-white/60 rounded-md" />
+                                    <Skeleton className="h-7 w-3/4 bg-white/70 rounded-xl" />
+                                    <Skeleton className="h-5 w-20 bg-white/60 rounded-lg" />
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        products.map((product, idx) => (
                         <div
                             key={product._id || product.id}
                             className="relative min-w-[300px] sm:min-w-[400px] aspect-4/5 group snap-start overflow-hidden rounded-[40px] bg-white border border-stone-100 shadow-xl shadow-stone-200/50"
@@ -112,7 +129,7 @@ const NewArrivals = ({ onQuickView, products = [] }) => {
                                 {idx + 1}
                             </div>
                         </div>
-                    ))}
+                    )))}
 
                     {/* Final "View All" Card */}
                     <div className="min-w-[300px] sm:min-w-[400px] aspect-4/5 flex flex-col items-center justify-center bg-emerald-800 rounded-[40px] relative overflow-hidden group">

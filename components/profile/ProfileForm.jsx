@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { User, Mail, Phone, MapPin, Save, Camera } from "lucide-react";
+import Skeleton from "@/components/ui/Skeleton";
 import toast from "react-hot-toast";
 
 export default function ProfileForm() {
@@ -38,11 +39,33 @@ export default function ProfileForm() {
         }
     };
 
-    if (loading || !user) return (
-        <div className="flex items-center justify-center p-20">
-            <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-        </div>
-    );
+    if (loading || !user) {
+        return (
+            <div className="animate-fade-in space-y-12">
+                {/* Header Skeleton */}
+                <div className="flex flex-col md:flex-row items-center gap-8 mb-12">
+                    <Skeleton className="w-32 h-32 sm:w-40 sm:h-40 rounded-[40px] flex-shrink-0" />
+                    <div className="flex-1 text-center md:text-left space-y-3">
+                        <Skeleton className="h-8 w-48 rounded-xl mx-auto md:mx-0" />
+                        <Skeleton className="h-4 w-36 rounded-md mx-auto md:mx-0 opacity-70" />
+                    </div>
+                    <Skeleton className="hidden md:block w-36 h-12 rounded-2xl" />
+                </div>
+
+                {/* Form Card Skeleton */}
+                <div className="bg-white rounded-[40px] p-8 sm:p-12 border border-stone-100/50 shadow-xl shadow-stone-200/20">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {[1, 2, 3, 4].map((i) => (
+                            <div key={i} className="space-y-3">
+                                <Skeleton className="h-3 w-20 rounded" />
+                                <Skeleton className="h-16 w-full rounded-[24px]" />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="animate-fade-in">

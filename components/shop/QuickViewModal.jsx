@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import useFetch from "@/utils/hooks/useFetch";
 import { SINGLE_PRODUCT_API } from "@/utils/APIs";
+import Skeleton from "@/components/ui/Skeleton";
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -245,7 +246,26 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
                     <p className="text-stone-500 font-medium leading-relaxed mb-8 text-sm" dangerouslySetInnerHTML={{ __html: product?.description.slice(0, 200) }} />
 
                     {/* Selectors */}
-                    {(data?.productColors?.length > 0 || data?.productSizes?.length > 0) && (
+                    {isLoading ? (
+                        <div className="space-y-4 py-2 mb-6">
+                            <div className="space-y-2">
+                                <Skeleton className="h-3 w-20 rounded" />
+                                <div className="flex gap-2">
+                                    {[1, 2, 3].map((i) => (
+                                        <Skeleton key={i} className="w-8 h-8 rounded-full" />
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Skeleton className="h-3 w-16 rounded" />
+                                <div className="flex gap-2">
+                                    {[1, 2, 3].map((i) => (
+                                        <Skeleton key={i} className="w-10 h-8 rounded-lg" />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    ) : (data?.productColors?.length > 0 || data?.productSizes?.length > 0) ? (
                         <div className="space-y-6">
                             {data?.productColors?.length > 0 && (
                                 <ColorSelector
@@ -264,7 +284,7 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
                                 />
                             )}
                         </div>
-                    )}
+                    ) : null}
 
                     {/* Actions */}
                     <div className="flex flex-col gap-4 mt-8 pt-6 border-t border-stone-100">

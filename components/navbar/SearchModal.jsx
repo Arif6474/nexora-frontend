@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Search, X, Loader2, ChevronRight, ArrowRight } from "lucide-react";
+import Skeleton from "@/components/ui/Skeleton";
 import { useRouter } from "next/navigation";
 
 const SearchModal = ({
@@ -93,7 +94,23 @@ const SearchModal = ({
                 {/* Search Results Area */}
                 <div className="max-h-[60vh] overflow-y-auto py-3">
                     {searchQuery.trim() ? (
-                        filteredProducts.length > 0 ? (
+                        isSearching ? (
+                            <div className="px-3 sm:px-4 flex flex-col gap-2">
+                                <div className="px-3 py-1 text-[11px] font-bold text-stone-400 uppercase tracking-wider">
+                                    <span>Searching catalog...</span>
+                                </div>
+                                {[1, 2, 3, 4].map((i) => (
+                                    <div key={i} className="flex items-center gap-4 p-3 rounded-2xl">
+                                        <Skeleton className="w-14 h-16 rounded-xl shrink-0" />
+                                        <div className="grow space-y-2">
+                                            <Skeleton className="h-4 w-3/5 rounded-md" />
+                                            <Skeleton className="h-3 w-2/5 rounded-md opacity-70" />
+                                        </div>
+                                        <Skeleton className="w-5 h-5 rounded-full shrink-0 opacity-30" />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : filteredProducts.length > 0 ? (
                             <div className="px-3 sm:px-4 flex flex-col gap-1">
                                 <div className="px-3 py-1 flex items-center justify-between text-[11px] font-bold text-stone-400 uppercase tracking-wider">
                                     <span>Products ({filteredProducts.length})</span>

@@ -21,9 +21,9 @@ function Home() {
 
       <CategorySection />
 
-      <TrendingProducts onQuickView={setSelectedProduct} products={data?.featuredProducts} />
+      <TrendingProducts onQuickView={setSelectedProduct} products={data?.featuredProducts} isLoading={isLoading} />
 
-      <NewArrivals onQuickView={setSelectedProduct} products={data?.latestProducts} />
+      <NewArrivals onQuickView={setSelectedProduct} products={data?.latestProducts} isLoading={isLoading} />
 
       <Testimonials testimonials={data?.testimonials} />
 
