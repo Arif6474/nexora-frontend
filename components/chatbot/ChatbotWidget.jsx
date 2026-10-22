@@ -107,82 +107,81 @@ export default function ChatbotWidget() {
                     }`}
                 >
                     {/* Header */}
-                    <div className="bg-stone-950/80 px-4 sm:px-5 py-3.5 border-b border-stone-800 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="relative">
-                                <div className="w-9 h-9 rounded-xl bg-linear-to-br from-emerald-600 to-emerald-800 flex items-center justify-center text-white shadow-md">
-                                    <Bot className="w-5 h-5 text-emerald-100" />
+                    <div className="bg-stone-950/80 px-4 sm:px-5 py-3 border-b border-stone-800">
+                        {/* Row 1: Brand + Icon Controls */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2.5">
+                                <div className="relative shrink-0">
+                                    <div className="w-9 h-9 rounded-xl bg-linear-to-br from-emerald-600 to-emerald-800 flex items-center justify-center text-white shadow-md">
+                                        <Bot className="w-5 h-5 text-emerald-100" />
+                                    </div>
+                                    <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 border-2 border-stone-950 rounded-full animate-pulse" />
                                 </div>
-                                <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 border-2 border-stone-950 rounded-full animate-pulse" />
-                            </div>
-                            <div>
                                 <div className="flex items-center gap-1.5">
-                                    <h3 className="text-sm font-black text-white tracking-tight">Nexora AI Assistant</h3>
-                                    <span className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-bold px-1.5 py-0.2 rounded-full uppercase">
+                                    <h3 className="text-sm font-black text-white tracking-tight whitespace-nowrap">Nexora AI</h3>
+                                    <span className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase shrink-0">
                                         AI
                                     </span>
                                 </div>
-                                <div className="flex items-center gap-2 mt-0.5">
-                                    <span className="text-[10px] text-stone-400 flex items-center gap-1">
-                                        <Globe className="w-2.5 h-2.5 text-emerald-500" />
-                                        {activeLanguage || "Multilingual"}
-                                    </span>
-                                    <span className="text-stone-700">•</span>
-                                    <span className="text-[10px] text-emerald-400 font-medium">Local Qwen 2.5</span>
-                                </div>
+                            </div>
+
+                            {/* Icon-only controls */}
+                            <div className="flex items-center gap-0.5 text-stone-400">
+                                <button
+                                    onClick={() => setShowHistory(prev => !prev)}
+                                    title={showHistory ? "Return to active chat" : "Consultation history"}
+                                    className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                                        showHistory
+                                            ? "text-emerald-400 bg-stone-800"
+                                            : "text-stone-400 hover:text-white hover:bg-stone-800"
+                                    }`}
+                                >
+                                    <History className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={clearHistory}
+                                    title="Reset conversation"
+                                    className="p-1.5 hover:text-white hover:bg-stone-800 rounded-lg transition-colors cursor-pointer"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={() => setIsExpanded(!isExpanded)}
+                                    title={isExpanded ? "Standard view" : "Expand window"}
+                                    className="hidden sm:block p-1.5 hover:text-white hover:bg-stone-800 rounded-lg transition-colors cursor-pointer"
+                                >
+                                    {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                                </button>
+                                <button
+                                    onClick={toggleChat}
+                                    title="Close chat"
+                                    className="p-1.5 hover:text-white hover:bg-stone-800 rounded-lg transition-colors cursor-pointer"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
                             </div>
                         </div>
 
-                        {/* Controls */}
-                        <div className="flex items-center gap-1 text-stone-400">
-                            {/* New Chat Button */}
+                        {/* Row 2: Language / model info + New Chat */}
+                        <div className="flex items-center justify-between mt-2">
+                            <div className="flex items-center gap-2">
+                                <span className="text-[10px] text-stone-400 flex items-center gap-1">
+                                    <Globe className="w-2.5 h-2.5 text-emerald-500" />
+                                    {activeLanguage || "Multilingual"}
+                                </span>
+                                <span className="text-stone-700">•</span>
+                                <span className="text-[10px] text-emerald-400 font-medium">Local Qwen 2.5</span>
+                            </div>
                             <button
                                 onClick={() => {
                                     startNewChat();
                                     setShowHistory(false);
                                 }}
                                 title="Start fresh consultation"
-                                className="flex items-center gap-1 px-2 py-1 text-[11px] font-semibold text-emerald-300 hover:text-white bg-emerald-950/50 hover:bg-emerald-900/60 border border-emerald-800/40 rounded-lg transition-colors cursor-pointer mr-0.5"
+                                className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold text-emerald-300 hover:text-white bg-emerald-950/50 hover:bg-emerald-900/60 border border-emerald-800/40 rounded-lg transition-colors cursor-pointer"
                             >
-                                <Plus className="w-3.5 h-3.5 text-emerald-400" />
-                                <span className="hidden sm:inline">New Chat</span>
-                            </button>
-
-                            {/* History Toggle */}
-                            <button
-                                onClick={() => setShowHistory(prev => !prev)}
-                                title={showHistory ? "Return to active chat" : "Consultation history"}
-                                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                                    showHistory
-                                        ? "text-emerald-400 bg-stone-800"
-                                        : "text-stone-400 hover:text-white hover:bg-stone-800"
-                                }`}
-                            >
-                                <History className="w-4 h-4" />
-                            </button>
-
-                            <button
-                                onClick={clearHistory}
-                                title="Reset conversation"
-                                className="p-1.5 hover:text-white hover:bg-stone-800 rounded-lg transition-colors cursor-pointer"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                            </button>
-
-                            <button
-                                onClick={() => setIsExpanded(!isExpanded)}
-                                title={isExpanded ? "Standard view" : "Expand window"}
-                                className="hidden sm:block p-1.5 hover:text-white hover:bg-stone-800 rounded-lg transition-colors cursor-pointer"
-                            >
-                                {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-                            </button>
-
-                            <button
-                                onClick={toggleChat}
-                                title="Close chat"
-                                className="p-1.5 hover:text-white hover:bg-stone-800 rounded-lg transition-colors cursor-pointer"
-                            >
-                                <X className="w-4 h-4" />
+                                <Plus className="w-3 h-3 text-emerald-400" />
+                                <span>New Chat</span>
                             </button>
                         </div>
                     </div>
