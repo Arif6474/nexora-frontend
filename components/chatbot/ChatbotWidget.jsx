@@ -474,7 +474,7 @@ export default function ChatbotWidget() {
 
                 <div className="text-left hidden sm:block pr-1">
                     <p className="text-[11px] font-black tracking-wider uppercase text-emerald-400">
-                       Nexora AI Assistant
+                       Nexora AI
                     </p>
                     <p className="text-[9px] font-semibold text-stone-400">
                         {isOpen ? "Click to minimize" : "Ask in any language"}
