@@ -27,4 +27,9 @@ export const SINGLE_PRODUCT_BY_SLUG_API = API_BASE_URL + 'getSingleProductBySlug
 export const TESTIMONIALS_API = API_BASE_URL + 'getAllTestimonials'
 export const SEARCH_PRODUCTS_API = API_BASE_URL + 'getAllProductsWithSearch'
 
+// Chatbot APIs
+export const CHATBOT_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL + 'api/customerApp/chatbot/'
+export const CHATBOT_MESSAGE_API = CHATBOT_API_BASE_URL + 'message'
+export const CHATBOT_HEALTH_API = CHATBOT_API_BASE_URL + 'health'
+
 
