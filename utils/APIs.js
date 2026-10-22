@@ -31,5 +31,7 @@ export const SEARCH_PRODUCTS_API = API_BASE_URL + 'getAllProductsWithSearch'
 export const CHATBOT_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL + 'api/customerApp/chatbot/'
 export const CHATBOT_MESSAGE_API = CHATBOT_API_BASE_URL + 'message'
 export const CHATBOT_HEALTH_API = CHATBOT_API_BASE_URL + 'health'
+export const CHATBOT_NEW_CHAT_API = CHATBOT_API_BASE_URL + 'new-chat'
+export const CHATBOT_CONVERSATIONS_API = CHATBOT_API_BASE_URL + 'conversations'
 
 
