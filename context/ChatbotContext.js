@@ -120,6 +120,7 @@ export const ChatbotProvider = ({ children }) => {
                 order: data.order || null,
                 requiresAuth: !!data.requiresAuth,
                 quickReplies: data.quickReplies || [],
+                verifiedSource: data.verifiedSource || null,
                 timestamp: new Date().toISOString()
             };
 
